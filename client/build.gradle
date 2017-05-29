@@ -1,0 +1,12 @@
+apply plugin: 'eclipse'
+apply plugin: 'java'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile project (':protocol')
+
+	compile 'org.eclipse.jetty.websocket:javax-websocket-client-impl:9.1.0.M0'
+}
