@@ -2,33 +2,33 @@ package ro.develbox.commands;
 
 import ro.develbox.annotation.CommandType;
 
-@CommandType(server=true, nextCommandType = {})
-public class CommandAuth extends Command{
+@CommandType(server = true, nextCommandType = {})
+public class CommandAuth extends Command {
 
-	public static final String COMMAND = "auth:";
-	
-	private String key = "asdasdasd";
-	
-	public CommandAuth(){
-		super(COMMAND);
-	}
+    public static final String COMMAND = "auth:";
 
-	public String getKey() {
-		return key;
-	}
+    private String key = "asdasdasd";
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    public CommandAuth() {
+        super(COMMAND);
+    }
 
-	@Override
-	public void getParametersFromNetwork(String stringParameters) {
-			setKey(stringParameters);	
-	}
+    public String getKey() {
+        return key;
+    }
 
-	@Override
-	protected String toNetworkParameters() {
-		return getKey();
-	}
-	
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    @Override
+    public void getParametersFromNetwork(String stringParameters) {
+        setKey(stringParameters);
+    }
+
+    @Override
+    protected String toNetworkParameters() {
+        return getKey();
+    }
+
 }

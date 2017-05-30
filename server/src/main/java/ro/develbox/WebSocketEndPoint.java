@@ -24,98 +24,96 @@ import ro.develbox.commands.protocol.ServerProtocol;
 import ro.develbox.model.User;
 
 @CommandType
-@ServerEndpoint(value="/cyclingWSE")
-public class WebSocketEndPoint implements ICommandSender,IProtocolResponse{
+@ServerEndpoint(value = "/cyclingWSE")
+public class WebSocketEndPoint implements ICommandSender, IProtocolResponse {
 
-	private ServerProtocol serverProtocol;
-	private Session session;
-	private boolean authed ;
-	private User user ;
+    private ServerProtocol serverProtocol;
+    private Session session;
+    private boolean authed;
+    private User user;
 
-	@OnOpen
-	public void onOpen(Session session){
-		System.out.println("Open");
-		this.session = session;
-		serverProtocol = new ServerProtocol(this, this);
-		authed =false;
-	}
-	
-	@OnClose
-	public void onClose(Session session){
-		System.out.println("Close");
-		this.session=null;
-		serverProtocol = null;
-		authed =false;
-	}
-	
-	@OnMessage
-	public void onMessage(String message, Session userSession){
-		System.out.println("MessageReceived : " +  message);
-		Command command = Command.constructCommand(message);
-		try {
-			serverProtocol.commandReceived(command);
-		} catch (WarnCommandException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ErrorCommandException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	@OnError
-	public void onError(Session session, Throwable e){
-		System.out.println("ERROR:");
-		e.printStackTrace(System.out);
-	}
+    @OnOpen
+    public void onOpen(Session session) {
+        System.out.println("Open");
+        this.session = session;
+        serverProtocol = new ServerProtocol(this, this);
+        authed = false;
+    }
 
-	@Override
-	public void sendCommand(Command command) {
-		if(session!=null){
-			try {
-				session.getBasicRemote().sendText(command.toNetwork());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    @OnClose
+    public void onClose(Session session) {
+        System.out.println("Close");
+        this.session = null;
+        serverProtocol = null;
+        authed = false;
+    }
 
-	@Override
-	public Command getCommandResponse(Command command) {
-		Command ret = null;
-		if(!authed){
-			System.out.println("NOT AUTHAED");
-			if(!(command instanceof CommandAuth)){
-				ret = new CommandMessage(TYPE.ERROR, "NOT AUTHED");
-				System.out.println("INCORECTR TYPE");
-			}else {
-				//TODO AUTH
-				authed = true;
-			}
-		}
-		else{
-			if (command instanceof CommandRegister) {
-				// TODO register user
-				User user = new User();
-				CommandRegister registerCm = (CommandRegister) command;
-				user.setEmail(registerCm.getEmail());
-				user.setName(registerCm.getNickName());
-				user.setRegid(registerCm.getRegistrationId());
-				//TODO persist user
-				this.user = user;
-				ret = new CommandMessage(TYPE.OK, "USER REGISTERED");
-			} else if (command instanceof CommandLogin) {
-				//TODO login user
-				//TODO check user
-				CommandLogin loginCm = (CommandLogin) command;
-				User user = new User();
-				user.setEmail(loginCm.getEmail());
-				ret = new CommandMessage(TYPE.OK, "USER LOGGED IN");
-			}
-		}
-		
-		return ret;
-	}
-	
+    @OnMessage
+    public void onMessage(String message, Session userSession) {
+        System.out.println("MessageReceived : " + message);
+        Command command = Command.constructCommand(message);
+        try {
+            serverProtocol.commandReceived(command);
+        } catch (WarnCommandException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ErrorCommandException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    @OnError
+    public void onError(Session session, Throwable e) {
+        System.out.println("ERROR:");
+        e.printStackTrace(System.out);
+    }
+
+    @Override
+    public void sendCommand(Command command) {
+        if (session != null) {
+            try {
+                session.getBasicRemote().sendText(command.toNetwork());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public Command getCommandResponse(Command command) {
+        Command ret = null;
+        if (!authed) {
+            System.out.println("NOT AUTHAED");
+            if (!(command instanceof CommandAuth)) {
+                ret = new CommandMessage(TYPE.ERROR, "NOT AUTHED");
+                System.out.println("INCORECTR TYPE");
+            } else {
+                // TODO AUTH
+                authed = true;
+            }
+        } else {
+            if (command instanceof CommandRegister) {
+                // TODO register user
+                User user = new User();
+                CommandRegister registerCm = (CommandRegister)command;
+                user.setEmail(registerCm.getEmail());
+                user.setName(registerCm.getNickName());
+                user.setRegid(registerCm.getRegistrationId());
+                // TODO persist user
+                this.user = user;
+                ret = new CommandMessage(TYPE.OK, "USER REGISTERED");
+            } else if (command instanceof CommandLogin) {
+                // TODO login user
+                // TODO check user
+                CommandLogin loginCm = (CommandLogin)command;
+                User user = new User();
+                user.setEmail(loginCm.getEmail());
+                ret = new CommandMessage(TYPE.OK, "USER LOGGED IN");
+            }
+        }
+
+        return ret;
+    }
+
 }
-

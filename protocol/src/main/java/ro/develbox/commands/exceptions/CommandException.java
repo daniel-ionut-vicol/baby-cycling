@@ -2,23 +2,21 @@ package ro.develbox.commands.exceptions;
 
 import ro.develbox.commands.Command;
 
-public abstract class CommandException extends Exception{
+public abstract class CommandException extends Exception {
 
-	private Command command;
+    private Command command;
 
-	public CommandException(Command command) {
-		super(command.toNetwork());
-		this.command = command;
-	}
+    public CommandException(Command command) {
+        super(command.toNetwork());
+        this.command = command;
+    }
 
-	public Command getCommand() {
-		return command;
-	}
+    public Command getCommand() {
+        return command;
+    }
 
-	public void setCommand(Command command) {
-		this.command = command;
-	}
-	
-	
-	
+    public void setCommand(Command command) {
+        this.command = command;
+    }
+
 }

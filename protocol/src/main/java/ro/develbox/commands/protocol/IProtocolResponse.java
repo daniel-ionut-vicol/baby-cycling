@@ -4,6 +4,6 @@ import ro.develbox.commands.Command;
 
 public interface IProtocolResponse {
 
-	public Command getCommandResponse(Command command);
-	
+    public Command getCommandResponse(Command command);
+
 }

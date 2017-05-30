@@ -2,61 +2,62 @@ package ro.develbox.commands;
 
 import ro.develbox.annotation.CommandType;
 
-@CommandType(client=true,server=true)
-public class CommandMessage extends Command{
-	
-	public static final String COMMAND = "message:";
+@CommandType(client = true, server = true)
+public class CommandMessage extends Command {
 
-	public static enum TYPE {OK,WARN,ERROR} ;
+    public static final String COMMAND = "message:";
 
-	private String message;
-	private TYPE type;
-	
-	public CommandMessage() {
-		super(COMMAND);
-	}
-	
-	public CommandMessage(TYPE type,String message) {
-		super(COMMAND);
-		this.type = type;
-		this.message = message;
-	}
+    public static enum TYPE {
+        OK, WARN, ERROR
+    };
 
-	public String getMessage() {
-		return message;
-	}
+    private String message;
+    private TYPE type;
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
+    public CommandMessage() {
+        super(COMMAND);
+    }
 
-	public TYPE getType() {
-		return type;
-	}
+    public CommandMessage(TYPE type, String message) {
+        super(COMMAND);
+        this.type = type;
+        this.message = message;
+    }
 
-	public void setType(TYPE type) {
-		this.type = type;
-	}
+    public String getMessage() {
+        return message;
+    }
 
-	private String getStringType() {
-		return type.name();
-	}
-	
-	private void setType(String type){
-		this.type = TYPE.valueOf(type);
-	}
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
-	@Override
-	public void getParametersFromNetwork(String stringParameters) {
-		String [] params = stringParameters.split(",");
-		setType(params[0]);
-		setMessage(params[1]);
-	}
+    public TYPE getType() {
+        return type;
+    }
 
-	@Override
-	protected String toNetworkParameters() {
-		return getStringType()+","+getMessage();
-	}
-	
-	
+    public void setType(TYPE type) {
+        this.type = type;
+    }
+
+    private String getStringType() {
+        return type.name();
+    }
+
+    private void setType(String type) {
+        this.type = TYPE.valueOf(type);
+    }
+
+    @Override
+    public void getParametersFromNetwork(String stringParameters) {
+        String[] params = stringParameters.split(",");
+        setType(params[0]);
+        setMessage(params[1]);
+    }
+
+    @Override
+    protected String toNetworkParameters() {
+        return getStringType() + "," + getMessage();
+    }
+
 }

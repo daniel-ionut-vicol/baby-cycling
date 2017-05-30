@@ -2,33 +2,33 @@ package ro.develbox.commands;
 
 import ro.develbox.annotation.CommandType;
 
-@CommandType(server=true, nextCommandType = {})
-public class CommandLogin extends Command{
+@CommandType(server = true, nextCommandType = {})
+public class CommandLogin extends Command {
 
-	public static final String COMMAND = "login:";
-	
-	private String email ;
-	
-	public CommandLogin() {
-		super(COMMAND);
-	}
+    public static final String COMMAND = "login:";
 
-	public String getEmail() {
-		return email;
-	}
+    private String email;
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public CommandLogin() {
+        super(COMMAND);
+    }
 
-	@Override
-	public void getParametersFromNetwork(String stringParameters) {
-			setEmail(stringParameters);	
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	@Override
-	protected String toNetworkParameters() {
-		return getEmail();
-	}
-	
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @Override
+    public void getParametersFromNetwork(String stringParameters) {
+        setEmail(stringParameters);
+    }
+
+    @Override
+    protected String toNetworkParameters() {
+        return getEmail();
+    }
+
 }
