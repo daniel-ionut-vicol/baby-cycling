@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import ro.develbox.commands.Command;
+import ro.develbox.commands.ICommandContructor;
 import ro.develbox.commands.protocol.ClientProtocol;
 
 public class WebSocketClient implements IClient {
@@ -12,12 +13,12 @@ public class WebSocketClient implements IClient {
     private ClientProtocol cProtocol;
     private ClientExceptionListener exListener;
 
-    public WebSocketClient(URI uri, ClientExceptionListener exListener) throws Exception {
+    public WebSocketClient(URI uri, ClientExceptionListener exListener,ICommandContructor commandConstr) throws Exception {
         this.exListener = exListener;
-        wsClient = new WSClient(uri);
+        wsClient = new WSClient(uri,commandConstr);
         wsClient.connect();
         wsClient.addListener(this);
-        cProtocol = new ClientProtocol(this, this);
+        cProtocol = new ClientProtocol(this, this,commandConstr);
     }
 
     @Override

@@ -3,11 +3,13 @@ package ro.develbox.commands;
 import ro.develbox.annotation.CommandType;
 
 @CommandType(server = true, nextCommandType = {})
-public class CommandLogin extends Command {
+public abstract class CommandLogin extends Command {
 
     public static final String COMMAND = "login:";
 
     private String email;
+    
+    private String password;
 
     public CommandLogin() {
         super(COMMAND);
@@ -21,14 +23,14 @@ public class CommandLogin extends Command {
         this.email = email;
     }
 
-    @Override
-    public void getParametersFromNetwork(String stringParameters) {
-        setEmail(stringParameters);
+    public String getPassword() {
+        return password;
     }
 
-    @Override
-    protected String toNetworkParameters() {
-        return getEmail();
+    public void setPassword(String password) {
+        this.password = password;
     }
+    
+    
 
 }

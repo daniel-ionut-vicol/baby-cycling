@@ -3,7 +3,7 @@ package ro.develbox.commands;
 import ro.develbox.annotation.CommandType;
 
 @CommandType(server = true, nextCommandType = { CommandLogin.class })
-public class CommandRegister extends Command {
+public abstract class CommandRegister extends Command {
     public static final String COMMAND = "reg:";
 
     private String nickName;
@@ -43,19 +43,6 @@ public class CommandRegister extends Command {
 
     public void setRegistrationId(String registrationId) {
         this.registrationId = registrationId;
-    }
-
-    @Override
-    public void getParametersFromNetwork(String stringParameters) {
-        String[] params = stringParameters.split(",");
-        setNickName(params[0]);
-        setEmail(params[1]);
-        setRegistrationId(params[2]);
-    }
-
-    @Override
-    protected String toNetworkParameters() {
-        return getNickName() + "," + getEmail() + "," + getRegistrationId();
     }
 
 }

@@ -16,11 +16,13 @@ import ro.develbox.commands.CommandLogin;
 import ro.develbox.commands.CommandMessage;
 import ro.develbox.commands.CommandMessage.TYPE;
 import ro.develbox.commands.CommandRegister;
+import ro.develbox.commands.ICommandContructor;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
 import ro.develbox.commands.protocol.ICommandSender;
 import ro.develbox.commands.protocol.IProtocolResponse;
 import ro.develbox.commands.protocol.ServerProtocol;
+import ro.develbox.commands.string.CommandConstructorString;
 import ro.develbox.model.User;
 
 @CommandType
@@ -32,11 +34,13 @@ public class WebSocketEndPoint implements ICommandSender, IProtocolResponse {
     private boolean authed;
     private User user;
 
+    private ICommandContructor commandConstr = new CommandConstructorString();
+    
     @OnOpen
     public void onOpen(Session session) {
         System.out.println("Open");
         this.session = session;
-        serverProtocol = new ServerProtocol(this, this);
+        serverProtocol = new ServerProtocol(this, this,commandConstr);
         authed = false;
     }
 
@@ -51,7 +55,7 @@ public class WebSocketEndPoint implements ICommandSender, IProtocolResponse {
     @OnMessage
     public void onMessage(String message, Session userSession) {
         System.out.println("MessageReceived : " + message);
-        Command command = Command.constructCommand(message);
+        Command command = commandConstr.constructCommand(message);
         try {
             serverProtocol.commandReceived(command);
         } catch (WarnCommandException e) {
@@ -86,7 +90,7 @@ public class WebSocketEndPoint implements ICommandSender, IProtocolResponse {
         if (!authed) {
             System.out.println("NOT AUTHAED");
             if (!(command instanceof CommandAuth)) {
-                ret = new CommandMessage(TYPE.ERROR, "NOT AUTHED");
+                ret = commandConstr.contructMessageCommand(TYPE.ERROR, "NOT AUTHED");
                 System.out.println("INCORECTR TYPE");
             } else {
                 // TODO AUTH
@@ -102,14 +106,14 @@ public class WebSocketEndPoint implements ICommandSender, IProtocolResponse {
                 user.setRegid(registerCm.getRegistrationId());
                 // TODO persist user
                 this.user = user;
-                ret = new CommandMessage(TYPE.OK, "USER REGISTERED");
+                ret = commandConstr.contructMessageCommand(TYPE.OK, "USER REGISTERED");
             } else if (command instanceof CommandLogin) {
                 // TODO login user
                 // TODO check user
                 CommandLogin loginCm = (CommandLogin)command;
                 User user = new User();
                 user.setEmail(loginCm.getEmail());
-                ret = new CommandMessage(TYPE.OK, "USER LOGGED IN");
+                ret = commandConstr.contructMessageCommand(TYPE.OK, "USER LOGGED IN");
             }
         }
 

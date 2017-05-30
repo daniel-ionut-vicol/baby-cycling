@@ -12,6 +12,8 @@ import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import ro.develbox.commands.Command;
+import ro.develbox.commands.ICommandContructor;
+import ro.develbox.commands.string.CommandConstructorString;
 
 public class WSClient extends WebSocketAdapter {
 
@@ -22,9 +24,12 @@ public class WSClient extends WebSocketAdapter {
     private URI uri;
 
     private List<IClient> listeners;
+    
+    ICommandContructor commandConstr ;
 
-    public WSClient(URI uri) {
+    public WSClient(URI uri,ICommandContructor commandConstr) {
         this.uri = uri;
+        this.commandConstr = commandConstr;
         listeners = new ArrayList<>();
     }
 
@@ -46,7 +51,7 @@ public class WSClient extends WebSocketAdapter {
     @Override
     public void onWebSocketText(String message) {
         // logic for creating command
-        Command command = Command.constructCommand(message);
+        Command command = commandConstr.constructCommand(message);
         if (command != null) {
             for (IClient listener : listeners) {
                 listener.commandReceived(command);

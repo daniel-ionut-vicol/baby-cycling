@@ -3,7 +3,7 @@ package ro.develbox.commands;
 import ro.develbox.annotation.CommandType;
 
 @CommandType(client = true, server = true)
-public class CommandMessage extends Command {
+public abstract class CommandMessage extends Command {
 
     public static final String COMMAND = "message:";
 
@@ -40,24 +40,12 @@ public class CommandMessage extends Command {
         this.type = type;
     }
 
-    private String getStringType() {
+    protected String getStringType() {
         return type.name();
     }
 
-    private void setType(String type) {
+    protected void setType(String type) {
         this.type = TYPE.valueOf(type);
-    }
-
-    @Override
-    public void getParametersFromNetwork(String stringParameters) {
-        String[] params = stringParameters.split(",");
-        setType(params[0]);
-        setMessage(params[1]);
-    }
-
-    @Override
-    protected String toNetworkParameters() {
-        return getStringType() + "," + getMessage();
     }
 
 }

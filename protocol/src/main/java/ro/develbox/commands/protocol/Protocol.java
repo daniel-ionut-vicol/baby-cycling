@@ -4,27 +4,49 @@ import ro.develbox.annotation.CommandType;
 import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandMessage;
 import ro.develbox.commands.CommandMessage.TYPE;
+import ro.develbox.commands.ICommandContructor;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
 
+/**
+ * implementing the protocol based on command annotations
+ * @author danielv
+ *
+ */
 public abstract class Protocol {
 
-    protected static CommandMessage unexpectedCommand = new CommandMessage(TYPE.ERROR, "Unexpected command");
-    protected static CommandMessage wrongCommand = new CommandMessage(TYPE.ERROR, "Wrong command");
+    /**
+     * cached messsage commands
+     */
+    protected CommandMessage unexpectedCommand ;
+    protected CommandMessage wrongCommand ;
 
     protected IProtocolResponse responder;
     protected ICommandSender sender;
-
+    
     protected Command lastCommand;
 
+    /**
+     * if should use server protocol or client one, true for server
+     */
     private boolean server;
 
-    protected Protocol(IProtocolResponse responder, ICommandSender sender, boolean server) {
+    protected Protocol(IProtocolResponse responder, ICommandSender sender , ICommandContructor commandConstr, boolean server) {
         this.responder = responder;
         this.sender = sender;
         this.server = server;
+        unexpectedCommand = commandConstr.contructMessageCommand(TYPE.ERROR, "Unexpected command");
+        wrongCommand = commandConstr.contructMessageCommand(TYPE.ERROR, "Wrong command");
     }
 
+    /**
+     * Check if command is valid , created the response and sends it on sender (if any response should be sent)
+     * 
+     * @param receivedCommand received command
+     * @return response command based on received one
+     * @throws WarnCommandException
+     * @throws ErrorCommandException
+     */
     public Command commandReceived(Command receivedCommand) throws WarnCommandException, ErrorCommandException {
         Command respCommand = null;
         if (receivedCommand == null) {
@@ -52,6 +74,11 @@ public abstract class Protocol {
         return respCommand;
     }
 
+    /**
+     * A command is valid when it has the expected type based on the last command sent and the command annotations
+     * @param receivedCommand
+     * @return if command is valid
+     */
     protected boolean validateCommandType(Command receivedCommand) {
         boolean result = true;
         if (receivedCommand == null) {
