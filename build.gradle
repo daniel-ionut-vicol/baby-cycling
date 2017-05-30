@@ -1,6 +1,29 @@
-apply plugin: 'java'
+allprojects{
+	apply plugin: 'java'
+	apply plugin: "eclipse"
+	apply plugin: "jacoco"
+}
 
 dependencies {
     compile project (':client')
     compile project (':server')
+}
+
+subprojects {
+    repositories {
+        mavenCentral()
+    }
+    
+    dependencies {
+    	// https://mvnrepository.com/artifact/org.testng/testng
+		testCompile group: 'org.testng', name: 'testng', version: '6.11'
+    	
+    	// https://mvnrepository.com/artifact/org.jmockit/jmockit
+		testCompile group: 'org.jmockit', name: 'jmockit', version: '1.32'
+    	
+    }
+    
+    test {
+        useTestNG()
+    }
 }
