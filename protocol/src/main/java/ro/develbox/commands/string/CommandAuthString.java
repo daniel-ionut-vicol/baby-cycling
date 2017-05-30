@@ -3,7 +3,6 @@ package ro.develbox.commands.string;
 import ro.develbox.annotation.CommandType;
 import ro.develbox.commands.CommandAuth;
 
-@CommandType(server = true, nextCommandType = {})
 public class CommandAuthString extends CommandAuth {
 
     @Override

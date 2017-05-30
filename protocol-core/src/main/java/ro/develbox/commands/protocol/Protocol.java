@@ -7,9 +7,11 @@ import ro.develbox.commands.CommandMessage.TYPE;
 import ro.develbox.commands.ICommandContructor;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
+import ro.develbox.commands.protocol.exceptions.ProtocolViolatedException;
 
 /**
  * implementing the protocol based on command annotations
+ * 
  * @author danielv
  *
  */
@@ -18,12 +20,12 @@ public abstract class Protocol {
     /**
      * cached messsage commands
      */
-    protected CommandMessage unexpectedCommand ;
-    protected CommandMessage wrongCommand ;
+    protected CommandMessage unexpectedCommand;
+    protected CommandMessage wrongCommand;
 
     protected IProtocolResponse responder;
     protected ICommandSender sender;
-    
+
     protected Command lastCommand;
 
     /**
@@ -31,7 +33,8 @@ public abstract class Protocol {
      */
     private boolean server;
 
-    protected Protocol(IProtocolResponse responder, ICommandSender sender , ICommandContructor commandConstr, boolean server) {
+    protected Protocol(IProtocolResponse responder, ICommandSender sender, ICommandContructor commandConstr,
+            boolean server) {
         this.responder = responder;
         this.sender = sender;
         this.server = server;
@@ -39,18 +42,38 @@ public abstract class Protocol {
         wrongCommand = commandConstr.contructMessageCommand(TYPE.ERROR, "Wrong command");
     }
 
+    public CommandMessage getUnexpectedCommand() {
+        return unexpectedCommand;
+    }
+
+    public CommandMessage getWrongCommand() {
+        return wrongCommand;
+    }
+
+    public Command getLastCommand() {
+        return lastCommand;
+    }
+
+    public boolean isServer() {
+        return server;
+    }
+
     /**
-     * Check if command is valid , created the response and sends it on sender (if any response should be sent)
+     * Check if command is valid , created the response and sends it on sender
+     * (if any response should be sent)
      * 
-     * @param receivedCommand received command
+     * @param receivedCommand
+     *            received command
      * @return response command based on received one
      * @throws WarnCommandException
      * @throws ErrorCommandException
      */
-    public Command commandReceived(Command receivedCommand) throws WarnCommandException, ErrorCommandException {
+    public Command commandReceived(Command receivedCommand) throws WarnCommandException, ErrorCommandException,ProtocolViolatedException {
         Command respCommand = null;
         if (receivedCommand == null) {
             respCommand = wrongCommand;
+            
+            throw new ProtocolViolatedException("Null command",receivedCommand, lastCommand, server);
         } else if (receivedCommand instanceof CommandMessage) {
             TYPE type = ((CommandMessage)receivedCommand).getType();
             if (TYPE.OK.equals(type)) {
@@ -67,6 +90,8 @@ public abstract class Protocol {
             }
         } else {
             respCommand = unexpectedCommand;
+            // instead of responding with wrong command, throw exception
+            throw new ProtocolViolatedException("Command invalid",receivedCommand, lastCommand, server);
         }
         if (respCommand != null) {
             sender.sendCommand(respCommand);
@@ -75,7 +100,9 @@ public abstract class Protocol {
     }
 
     /**
-     * A command is valid when it has the expected type based on the last command sent and the command annotations
+     * A command is valid when it has the expected type based on the last
+     * command sent and the command annotations
+     * 
      * @param receivedCommand
      * @return if command is valid
      */

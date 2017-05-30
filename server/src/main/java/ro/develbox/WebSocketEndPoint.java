@@ -22,6 +22,7 @@ import ro.develbox.commands.exceptions.WarnCommandException;
 import ro.develbox.commands.protocol.ICommandSender;
 import ro.develbox.commands.protocol.IProtocolResponse;
 import ro.develbox.commands.protocol.ServerProtocol;
+import ro.develbox.commands.protocol.exceptions.ProtocolViolatedException;
 import ro.develbox.commands.string.CommandConstructorString;
 import ro.develbox.model.User;
 
@@ -62,6 +63,9 @@ public class WebSocketEndPoint implements ICommandSender, IProtocolResponse {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (ErrorCommandException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ProtocolViolatedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
