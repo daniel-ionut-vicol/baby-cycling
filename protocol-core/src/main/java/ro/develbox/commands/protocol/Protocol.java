@@ -4,7 +4,6 @@ import ro.develbox.annotation.CommandType;
 import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandMessage;
 import ro.develbox.commands.CommandMessage.TYPE;
-import ro.develbox.commands.ICommandContructor;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
 import ro.develbox.commands.protocol.exceptions.ProtocolViolatedException;
@@ -17,12 +16,6 @@ import ro.develbox.commands.protocol.exceptions.ProtocolViolatedException;
  */
 public abstract class Protocol {
 
-    /**
-     * cached messsage commands
-     */
-    protected CommandMessage unexpectedCommand;
-    protected CommandMessage wrongCommand;
-
     protected IProtocolResponse responder;
     protected ICommandSender sender;
 
@@ -33,21 +26,10 @@ public abstract class Protocol {
      */
     private boolean server;
 
-    protected Protocol(IProtocolResponse responder, ICommandSender sender, ICommandContructor commandConstr,
-            boolean server) {
+    protected Protocol(IProtocolResponse responder, ICommandSender sender, boolean server) {
         this.responder = responder;
         this.sender = sender;
         this.server = server;
-        unexpectedCommand = commandConstr.contructMessageCommand(TYPE.ERROR, "Unexpected command");
-        wrongCommand = commandConstr.contructMessageCommand(TYPE.ERROR, "Wrong command");
-    }
-
-    public CommandMessage getUnexpectedCommand() {
-        return unexpectedCommand;
-    }
-
-    public CommandMessage getWrongCommand() {
-        return wrongCommand;
     }
 
     public Command getLastCommand() {
@@ -68,12 +50,11 @@ public abstract class Protocol {
      * @throws WarnCommandException
      * @throws ErrorCommandException
      */
-    public Command commandReceived(Command receivedCommand) throws WarnCommandException, ErrorCommandException,ProtocolViolatedException {
+    public Command commandReceived(Command receivedCommand)
+            throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
         Command respCommand = null;
         if (receivedCommand == null) {
-            respCommand = wrongCommand;
-            
-            throw new ProtocolViolatedException("Null command",receivedCommand, lastCommand, server);
+            throw new ProtocolViolatedException("Null command", receivedCommand, lastCommand, server);
         } else if (receivedCommand instanceof CommandMessage) {
             TYPE type = ((CommandMessage)receivedCommand).getType();
             if (TYPE.OK.equals(type)) {
@@ -89,11 +70,10 @@ public abstract class Protocol {
                 lastCommand = receivedCommand;
             }
         } else {
-            respCommand = unexpectedCommand;
             // instead of responding with wrong command, throw exception
-            throw new ProtocolViolatedException("Command invalid",receivedCommand, lastCommand, server);
+            throw new ProtocolViolatedException("Command invalid", receivedCommand, lastCommand, server);
         }
-        if (respCommand != null) {
+        if (respCommand != null && validateResponse(respCommand)) {
             sender.sendCommand(respCommand);
         }
         return respCommand;
@@ -110,6 +90,10 @@ public abstract class Protocol {
         boolean result = true;
         if (receivedCommand == null) {
             result = false;
+        }
+        if (receivedCommand instanceof CommandMessage) {
+            // accept any received
+            return true;
         } else {
             CommandType ann = (CommandType)receivedCommand.getClass().getAnnotation(CommandType.class);
             if (ann != null) {
@@ -131,7 +115,7 @@ public abstract class Protocol {
         }
         CommandType last = (CommandType)lastCommand.getClass().getAnnotation(CommandType.class);
         Class[] accepted = last.nextCommandType();
-        // we do not accept any response type when node is specified
+        // we do not accept any response type when none is specified
         if (accepted == null || accepted.length == 0) {
             // TODO maybe we should report this, since the protocol seems to be
             // badly written
@@ -159,6 +143,7 @@ public abstract class Protocol {
     }
 
     protected boolean validateResponse(Command respCommand) {
+        // any message response is considered valid
         if (respCommand instanceof CommandMessage) {
             return true;
         }

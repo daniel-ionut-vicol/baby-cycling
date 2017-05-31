@@ -18,7 +18,7 @@ public class WebSocketClient implements IClient {
         wsClient = new WSClient(uri,commandConstr);
         wsClient.connect();
         wsClient.addListener(this);
-        cProtocol = new ClientProtocol(this, this,commandConstr);
+        cProtocol = new ClientProtocol(this, this);
     }
 
     @Override

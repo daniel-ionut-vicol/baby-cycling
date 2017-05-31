@@ -13,7 +13,6 @@ import ro.develbox.annotation.CommandType;
 import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandAuth;
 import ro.develbox.commands.CommandLogin;
-import ro.develbox.commands.CommandMessage;
 import ro.develbox.commands.CommandMessage.TYPE;
 import ro.develbox.commands.CommandRegister;
 import ro.develbox.commands.ICommandContructor;
@@ -41,7 +40,7 @@ public class WebSocketEndPoint implements ICommandSender, IProtocolResponse {
     public void onOpen(Session session) {
         System.out.println("Open");
         this.session = session;
-        serverProtocol = new ServerProtocol(this, this,commandConstr);
+        serverProtocol = new ServerProtocol(this, this);
         authed = false;
     }
 
