@@ -12,8 +12,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import mockit.Expectations;
-import mockit.Verifications;
-import mockit.internal.expectations.TestOnlyPhase;
 import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandMessage;
 import ro.develbox.commands.CommandMessage.TYPE;
@@ -25,14 +23,14 @@ public class ProtocolTest {
 
     IProtocolResponse responder;
     ICommandSender sender;
-    
+
     Command responderCommand;
-    
+
     @BeforeClass
     public void setup() {
-        
+
         responderCommand = new TestTypeCommand();
-        
+
         responder = new IProtocolResponse() {
 
             @Override
@@ -51,14 +49,14 @@ public class ProtocolTest {
     }
 
     @Test
-    public void testProtocolConstructor(){
-        Protocol protocol = new Protocol(responder, sender,true) {
+    public void testProtocolConstructor() {
+        Protocol protocol = new Protocol(responder, sender, true) {
         };
-        assertTrue(protocol.responder==responder);
-        assertTrue(protocol.sender==sender);
+        assertTrue(protocol.responder == responder);
+        assertTrue(protocol.sender == sender);
         assertTrue(protocol.isServer());
     }
-    
+
     @Test
     public void testServerProtocolConstructor() {
         Protocol serverP = new ServerProtocol(responder, sender);
@@ -137,21 +135,37 @@ public class ProtocolTest {
         }
     }
 
+    @DataProvider(name = "testNextMessageResponseData")
+    public Object[][] testNextMessageResponseData() {
+        return new Object[][] { { TYPE.OK, true }, { TYPE.WARN, false }, { TYPE.ERROR, false } };
+    }
+
+    @Test(dataProvider = "testNextMessageResponseData")
+    public void testSetNextOnMessageResponse(TYPE type, boolean result) {
+        Protocol protocol = new Protocol(responder, sender, true) {
+        };
+        CommandMessage resp = createMessage(type);
+        assertTrue(protocol.setNextExpectedType(resp) == result);
+    }
+
     @Test
-    public void testCommandReceived() throws WarnCommandException, ErrorCommandException, ProtocolViolatedException{
-        
-        new Expectations(sender) {{
-            sender.sendCommand(responderCommand);times=1;
-        }};
-        
+    public void testCommandReceived() throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
+
+        new Expectations(sender) {
+            {
+                sender.sendCommand(responderCommand);
+                times = 1;
+            }
+        };
+
         Protocol protocol = new Protocol(responder, sender, true) {
         };
         Command received = new TestTypeCommand();
         Command response = protocol.commandReceived(received);
         assertTrue(response == responderCommand);
-        assertTrue(protocol.lastCommand==received);
+        assertTrue(protocol.lastCommand == received);
     }
-    
+
     public CommandMessage createMessage(final TYPE type) {
         return new CommandMessage(type, "") {
 
