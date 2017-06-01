@@ -4,6 +4,7 @@ import ro.develbox.annotation.CommandInfo;
 import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandMessage;
 import ro.develbox.commands.CommandMessage.TYPE;
+import ro.develbox.commands.CommandReset;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
 import ro.develbox.commands.protocol.exceptions.ProtocolViolatedException;
@@ -55,7 +56,9 @@ public abstract class Protocol {
         Command respCommand = null;
         if (receivedCommand == null) {
             throw new ProtocolViolatedException("Null command", receivedCommand, lastCommand, server);
-        } else if (receivedCommand instanceof CommandMessage) {
+        }else if (receivedCommand instanceof CommandReset) { 
+            reset();
+        }else if (receivedCommand instanceof CommandMessage) {
             TYPE type = ((CommandMessage)receivedCommand).getType();
             if (TYPE.OK.equals(type)) {
                 // Do nothing, we just found out that we behaved correctly
@@ -79,6 +82,22 @@ public abstract class Protocol {
         return respCommand;
     }
 
+    private void reset(){
+        reset(null);
+    }
+    
+    /**
+     * reset protocol and send reset command to the sender
+     * @param reset - reset command that will be sent to the other end
+     */
+    public void reset(CommandReset reset){
+        lastCommand = null;
+        if(reset!=null){
+            sender.sendCommand(reset);
+        }
+        
+    }
+    
     /**
      * A command is valid when it has the expected type based on the last
      * command sent and the command annotations

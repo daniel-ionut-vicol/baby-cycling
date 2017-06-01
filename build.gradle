@@ -16,10 +16,10 @@ subprojects {
     
     dependencies {
     	// https://mvnrepository.com/artifact/org.testng/testng
-		testCompile group: 'org.testng', name: 'testng', version: '6.11'
+		testCompile group: 'org.testng', name: 'testng', version: '6.9.10'
     	
     	// https://mvnrepository.com/artifact/org.jmockit/jmockit
-		testCompile group: 'org.jmockit', name: 'jmockit', version: '1.32'
+		testCompile group: 'org.jmockit', name: 'jmockit', version: '1.31'
     	
     }
     
