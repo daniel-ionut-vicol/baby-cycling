@@ -1,9 +1,9 @@
 package ro.develbox.commands.protocol;
 
-import ro.develbox.annotation.CommandType;
+import ro.develbox.annotation.CommandInfo;
 import ro.develbox.commands.Command;
 
-@CommandType(server = false, client = true)
+@CommandInfo(server = false, client = true)
 public class ClientTypeTestCommand extends Command {
     public ClientTypeTestCommand() {
         super("test");

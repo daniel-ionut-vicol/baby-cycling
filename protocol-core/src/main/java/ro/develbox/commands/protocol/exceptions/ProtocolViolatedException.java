@@ -2,7 +2,7 @@ package ro.develbox.commands.protocol.exceptions;
 
 import java.util.Arrays;
 
-import ro.develbox.annotation.CommandType;
+import ro.develbox.annotation.CommandInfo;
 import ro.develbox.commands.Command;
 
 public class ProtocolViolatedException extends Exception {
@@ -24,7 +24,7 @@ public class ProtocolViolatedException extends Exception {
         if (command == null) {
             return cause;
         }
-        CommandType annotation = (CommandType)command.getClass().getAnnotation(CommandType.class);
+        CommandInfo annotation = (CommandInfo)command.getClass().getAnnotation(CommandInfo.class);
 
         String commandAnnotation = stringAnnotation(annotation);
         String curretnCommandMessage = "Comand : " + command.getCommand() + " violates protocol. Received on "
@@ -32,7 +32,7 @@ public class ProtocolViolatedException extends Exception {
         String secondPartMessage = "\n\t\t" + "Previously command";
 
         if (prevCommand != null) {
-            annotation = (CommandType)prevCommand.getClass().getAnnotation(CommandType.class);
+            annotation = (CommandInfo)prevCommand.getClass().getAnnotation(CommandInfo.class);
             secondPartMessage = prevCommand.getCommand() + " with annotation " + stringAnnotation(annotation);
         } else {
             secondPartMessage = secondPartMessage + " NULL";
@@ -40,7 +40,7 @@ public class ProtocolViolatedException extends Exception {
         return cause + " \n\t" + curretnCommandMessage + secondPartMessage;
     }
 
-    private static String stringAnnotation(CommandType annotation) {
+    private static String stringAnnotation(CommandInfo annotation) {
         String annotationStr = null;
         if (annotation != null) {
             annotationStr = "server:" + annotation.server() + ",client:" + annotation.client() + ",next command : "

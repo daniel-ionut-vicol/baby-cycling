@@ -1,8 +1,8 @@
 package ro.develbox.commands;
 
-import ro.develbox.annotation.CommandType;
+import ro.develbox.annotation.CommandInfo;
 
-@CommandType(server = true, nextCommandType = {})
+@CommandInfo(server = true, nextCommandType = {})
 public abstract class CommandLogin extends Command {
 
     public static final String COMMAND = "login:";

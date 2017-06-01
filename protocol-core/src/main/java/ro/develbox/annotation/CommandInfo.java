@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
  *
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CommandType {
+public @interface CommandInfo {
     /**
      * if command should be received by the server
      */
@@ -20,6 +20,16 @@ public @interface CommandType {
      */
     boolean client() default false;
 
+    /**
+     * if command is the start of a command chain
+     */
+    boolean start() default false;
+    
+    /**
+     * if command is the end of a command chain
+     */
+    boolean terminal() default false;
+    
     /**
      * next command accepted 
      */

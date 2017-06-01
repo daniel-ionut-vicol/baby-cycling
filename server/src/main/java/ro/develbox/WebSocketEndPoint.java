@@ -9,7 +9,6 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import ro.develbox.annotation.CommandType;
 import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandAuth;
 import ro.develbox.commands.CommandLogin;
@@ -25,7 +24,6 @@ import ro.develbox.commands.protocol.exceptions.ProtocolViolatedException;
 import ro.develbox.commands.string.CommandConstructorString;
 import ro.develbox.model.User;
 
-@CommandType
 @ServerEndpoint(value = "/cyclingWSE")
 public class WebSocketEndPoint implements ICommandSender, IProtocolResponse {
 

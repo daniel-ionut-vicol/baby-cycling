@@ -1,6 +1,6 @@
 package ro.develbox.commands.string;
 
-import ro.develbox.annotation.CommandType;
+import ro.develbox.annotation.CommandInfo;
 import ro.develbox.commands.CommandAuth;
 
 public class CommandAuthString extends CommandAuth {

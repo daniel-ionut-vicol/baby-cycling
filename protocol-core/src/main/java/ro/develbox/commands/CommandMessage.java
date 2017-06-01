@@ -1,8 +1,8 @@
 package ro.develbox.commands;
 
-import ro.develbox.annotation.CommandType;
+import ro.develbox.annotation.CommandInfo;
 
-@CommandType(client = true, server = true)
+@CommandInfo(client = true, server = true)
 public abstract class CommandMessage extends Command {
 
     public static final String COMMAND = "message:";

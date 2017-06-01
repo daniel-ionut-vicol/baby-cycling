@@ -1,6 +1,6 @@
 package ro.develbox.commands.protocol;
 
-import ro.develbox.annotation.CommandType;
+import ro.develbox.annotation.CommandInfo;
 import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandMessage;
 import ro.develbox.commands.CommandMessage.TYPE;
@@ -95,7 +95,7 @@ public abstract class Protocol {
             // accept any received
             return true;
         } else {
-            CommandType ann = (CommandType)receivedCommand.getClass().getAnnotation(CommandType.class);
+            CommandInfo ann = (CommandInfo)receivedCommand.getClass().getAnnotation(CommandInfo.class);
             if (ann != null) {
                 result = (ann.server() && server) || (ann.client() && !server);
                 if (result) {
@@ -113,7 +113,7 @@ public abstract class Protocol {
         if (lastCommand == null) {
             return true;
         }
-        CommandType last = (CommandType)lastCommand.getClass().getAnnotation(CommandType.class);
+        CommandInfo last = (CommandInfo)lastCommand.getClass().getAnnotation(CommandInfo.class);
         Class[] accepted = last.nextCommandType();
         // we do not accept any response type when none is specified
         if (accepted == null || accepted.length == 0) {
@@ -147,7 +147,7 @@ public abstract class Protocol {
         if (respCommand instanceof CommandMessage) {
             return true;
         }
-        CommandType last = (CommandType)lastCommand.getClass().getAnnotation(CommandType.class);
+        CommandInfo last = (CommandInfo)lastCommand.getClass().getAnnotation(CommandInfo.class);
         Class[] accepted = last.responseCommandType();
         Class responseClass = respCommand.getClass();
         if (accepted == null || accepted.length == 0) {
