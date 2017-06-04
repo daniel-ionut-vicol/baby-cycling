@@ -1,9 +1,11 @@
 package ro.develbox.commands.protocol;
 
-import ro.develbox.annotation.CommandInfo;
+import ro.develbox.annotation.ClientCommand;
+import ro.develbox.annotation.ServerCommand;
 import ro.develbox.commands.Command;
 
-@CommandInfo(server=true,client=true,nextCommandType={TestTypeCommand.class},responseCommandType={TestTypeCommand.class})
+@ClientCommand(nextCommandType={TestTypeCommand.class},responseCommandType={TestTypeCommand.class})
+@ServerCommand(nextCommandType={TestTypeCommand.class},responseCommandType={TestTypeCommand.class})
 public class TestTypeCommand extends Command{
 
     public TestTypeCommand() {

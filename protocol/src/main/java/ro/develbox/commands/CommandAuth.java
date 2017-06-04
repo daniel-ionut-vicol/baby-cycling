@@ -1,13 +1,13 @@
 package ro.develbox.commands;
 
-import ro.develbox.annotation.CommandInfo;
+import ro.develbox.annotation.ServerCommand;
 
 /**
  * Command sent to authenticate the client ( validate that client is using this client)
  * @author danielv
  *
  */
-@CommandInfo(server = true, nextCommandType = {})
+@ServerCommand
 public abstract class CommandAuth extends Command {
 
     public static final String COMMAND = "auth:";

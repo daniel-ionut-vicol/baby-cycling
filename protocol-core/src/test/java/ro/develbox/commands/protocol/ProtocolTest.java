@@ -12,23 +12,23 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import mockit.Expectations;
-import mockit.Mocked;
-import mockit.Verifications;
+import ro.develbox.annotation.ClientCommand;
+import ro.develbox.annotation.ServerCommand;
 import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandMessage;
-import ro.develbox.commands.CommandReset;
 import ro.develbox.commands.CommandMessage.TYPE;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
 import ro.develbox.commands.protocol.exceptions.ProtocolViolatedException;
 
+@SuppressWarnings({"rawtypes"})
 public class ProtocolTest {
 
     IProtocolResponse responder;
     ICommandSender sender;
 
     Command responderCommand;
-
+    
     @BeforeClass
     public void setup() {
 
@@ -53,23 +53,33 @@ public class ProtocolTest {
 
     @Test
     public void testProtocolConstructor() {
-        Protocol protocol = new Protocol(responder, sender, true) {
+        Protocol protocol = new Protocol(responder, sender, ClientCommand.class) {
+
+            @Override
+            protected Class[] getAcceptedCommands() {
+                return null;
+            }
+
+            @Override
+            protected Class[] getAcceptedResponses() {
+                return null;
+            }
         };
         assertTrue(protocol.responder == responder);
         assertTrue(protocol.sender == sender);
-        assertTrue(protocol.isServer());
+        assertTrue(protocol.commandAnnotation == ClientCommand.class);
     }
-
+    
     @Test
     public void testServerProtocolConstructor() {
         Protocol serverP = new ServerProtocol(responder, sender);
-        Assert.assertTrue(serverP.isServer());
+        Assert.assertTrue(serverP.commandAnnotation==ServerCommand.class);
     }
 
     @Test
     public void testClientProtocolConstructor() {
         Protocol clientP = new ClientProtocol(responder, sender);
-        Assert.assertFalse(clientP.isServer());
+        Assert.assertTrue(clientP.commandAnnotation==ClientCommand.class);
     }
 
     @Test(expectedExceptions = {
@@ -89,30 +99,33 @@ public class ProtocolTest {
     @Test(expectedExceptions = {
             ProtocolViolatedException.class }, expectedExceptionsMessageRegExp = ".*Null command.*")
     public void testNullCommandRejected() throws Exception {
-        Protocol protocol = new Protocol(responder, sender, true) {
-        };
+        Protocol protocol = createProtocol();
         protocol.commandReceived(null);
     }
-
-    @Test
-    public void testNextExpectedCommandGoodValidation()
-            throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
-        Protocol protocol = new Protocol(responder, sender, true) {
+    
+    @DataProvider(name="comandValidationDp")
+    public Object[][] comandValidationDp(){
+        return new Object[][]{
+            {new ServerProtocol(responder, sender),new ClientTypeTestCommand()},
+            {new ClientProtocol(responder, sender),new ServerTypeTestCommand()}
         };
+    }
+    
+    @Test(dataProvider="comandValidationDp")
+    public void testNextExpectedCommandGoodValidation(Protocol protocol, Command badCommand)
+            throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
         TestTypeCommand command = new TestTypeCommand();
         protocol.lastCommand = command;
         assertTrue(protocol.validateCommandType(command));
-        assertFalse(protocol.validateCommandType(new ServerTypeTestCommand()));
+        assertFalse(protocol.validateCommandType(badCommand));
     }
 
-    @Test
-    public void testResponseCommandValidation() {
-        Protocol protocol = new Protocol(responder, sender, true) {
-        };
+    @Test(dataProvider="comandValidationDp")
+    public void testResponseCommandValidation(Protocol protocol, Command badCommand) {
         TestTypeCommand command = new TestTypeCommand();
         protocol.lastCommand = command;
         assertTrue(protocol.validateResponse(command));
-        assertFalse(protocol.validateResponse(new ServerTypeTestCommand()));
+        assertFalse(protocol.validateResponse(badCommand));
     }
 
     @DataProvider(name = "testMessageCommandsData")
@@ -123,8 +136,7 @@ public class ProtocolTest {
 
     @Test(dataProvider = "testMessageCommandsData")
     public void testMessageCommands(TYPE type, Class expectedException) {
-        Protocol protocol = new Protocol(responder, sender, true) {
-        };
+        Protocol protocol = createProtocol();
         Command message = createMessage(type);
         try {
             Command resp = protocol.commandReceived(message);
@@ -145,14 +157,21 @@ public class ProtocolTest {
 
     @Test(dataProvider = "testNextMessageResponseData")
     public void testSetNextOnMessageResponse(TYPE type, boolean result) {
-        Protocol protocol = new Protocol(responder, sender, true) {
-        };
+        Protocol protocol = createProtocol();
         CommandMessage resp = createMessage(type);
         assertTrue(protocol.setNextExpectedType(resp) == result);
     }
 
-    @Test
-    public void testCommandReceived() throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
+    @DataProvider(name="protocolImpls")
+    public Object[][] protocolImpls(){
+        return new Object[][]{
+            {new ServerProtocol(responder, sender)},
+            {new ClientProtocol(responder, sender)}
+        };
+    }
+    
+    @Test(dataProvider="protocolImpls")
+    public void testCommandReceived(Protocol protocol) throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
 
         new Expectations(sender) {
             {
@@ -160,27 +179,28 @@ public class ProtocolTest {
                 times = 1;
             }
         };
-
-        Protocol protocol = new Protocol(responder, sender, true) {
-        };
         Command received = new TestTypeCommand();
         Command response = protocol.commandReceived(received);
         assertTrue(response == responderCommand);
         assertTrue(protocol.lastCommand == received);
     }
-    
-    @Test
-    public void testReset(@Mocked final CommandReset reset,@Mocked final ICommandSender sender){
-        Protocol protocol = new Protocol(responder, sender, true) {
-        };
-        protocol.reset(reset);
-        
-        assertNull(protocol.lastCommand);
-        new Verifications(){{
-            sender.sendCommand(reset);times = 1;
-        }};
-    }
 
+    private Protocol createProtocol(){
+        Protocol protocol = new Protocol(responder, sender, ClientCommand.class) {
+
+            @Override
+            protected Class[] getAcceptedCommands() {
+                return null;
+            }
+
+            @Override
+            protected Class[] getAcceptedResponses() {
+                return null;
+            }
+        };
+        return protocol;
+    }
+    
     public CommandMessage createMessage(final TYPE type) {
         return new CommandMessage(type, "") {
 
