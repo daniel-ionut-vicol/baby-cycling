@@ -82,9 +82,6 @@ public class ProtocolTest {
         assertTrue(protocol.commandAnnotation == ClientCommand.class);
     }
 
-
-
-
     @Test(expectedExceptions = {
             ProtocolViolatedException.class }, expectedExceptionsMessageRegExp = ".*Null command.*")
     public void testNullCommandRejected() throws Exception {
@@ -141,6 +138,14 @@ public class ProtocolTest {
     }
 
     @Test
+    public void testResetReceived(@Mocked final CommandReset reset)
+            throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
+        Protocol protocol = createProtocol();
+        protocol.commandReceived(reset);
+        assertNull(protocol.lastCommand);
+    }
+
+    @Test
     public void testCommandWithStartAccepted()
             throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
         Protocol protocol = createProtocol();
@@ -179,32 +184,60 @@ public class ProtocolTest {
         assertNull(protocol.lastCommand);
     }
 
+    @Test(expectedExceptions=ProtocolViolatedException.class)
+    public void testValidationAgainsLastCommandNullAccepted() throws WarnCommandException, ErrorCommandException, ProtocolViolatedException{
+        Protocol protocol = createProtocol();
+        protocol.lastCommand = new TestTypeCommand();
+        protocol.commandReceived(new TestTypeCommand());
+    }
+    
+    @Test(expectedExceptions=ProtocolViolatedException.class)
+    public void testValidationAgainsLastCommandNotAccepted() throws WarnCommandException, ErrorCommandException, ProtocolViolatedException{
+        Class [] accepted = {ProtocolTest.class};
+        Protocol protocol = createProtocol(accepted);
+        protocol.lastCommand = new TestTypeCommand();
+        protocol.commandReceived(new TestTypeCommand());
+    }
+    
+    @Test
+    public void testValidationAgainsLastCommandAccepted() throws WarnCommandException, ErrorCommandException, ProtocolViolatedException{
+        Class [] accepted = {TestTypeCommand.class};
+        Protocol protocol = createProtocol(accepted);
+        protocol.lastCommand = new TestTypeCommand();
+        protocol.commandReceived(new TestTypeCommand());
+    }
+    
     private Protocol createProtocol() {
         return createProtocol(sender);
     }
 
     private Protocol createProtocol(ICommandSender sender) {
-        return createProtocol(responder, sender, null);
+        return createProtocol(responder, sender, null,null);
     }
-
+    
+    private Protocol createProtocol(Class[] accReqs) {
+        return createProtocol(responder, sender, accReqs,null);
+    }
+    
     private Protocol createProtocol(IProtocolResponse responder, Class[] accResp) {
-        return createProtocol(responder, sender, accResp);
+        return createProtocol(responder, sender, null,accResp);
     }
 
-    private Protocol createProtocol(IProtocolResponse responder, ICommandSender sender, final Class[] accResp) {
+    private Protocol createProtocol(IProtocolResponse responder, ICommandSender sender,final Class[] accReqs ,final Class[] accResp) {
         Protocol protocol = new Protocol(responder, sender, TestAnnotation.class) {
 
             @Override
             protected Class[] getAcceptedCommands() {
-                return null;
+                return accReqs;
             }
 
             @Override
             protected Class[] getAcceptedResponses() {
                 return accResp;
             }
-            
-            protected ProtocolViolatedException getProtocolViolatedException(String cause, Command command, Command prevCommand){
+
+            protected ProtocolViolatedException getProtocolViolatedException(String cause, Command command,
+                    Command prevCommand) {
                 return new ProtocolViolatedTestException(cause, command, prevCommand);
             }
         };
