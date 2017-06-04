@@ -1,5 +1,7 @@
 package ro.develbox.commands.protocol;
 
+import ro.develbox.annotation.StartCommand;
+import ro.develbox.annotation.TerminalCommand;
 import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandMessage;
 import ro.develbox.commands.CommandMessage.TYPE;
@@ -14,7 +16,7 @@ import ro.develbox.commands.protocol.exceptions.ProtocolViolatedException;
  * @author danielv
  *
  */
-@SuppressWarnings({"unchecked","rawtypes"})
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public abstract class Protocol {
 
     protected IProtocolResponse responder;
@@ -51,10 +53,10 @@ public abstract class Protocol {
             throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
         Command respCommand = null;
         if (receivedCommand == null) {
-            throw new ProtocolViolatedException("Null command", receivedCommand, lastCommand,commandAnnotation);
-        }else if (receivedCommand instanceof CommandReset) { 
+            throw new ProtocolViolatedException("Null command", receivedCommand, lastCommand, commandAnnotation);
+        } else if (receivedCommand instanceof CommandReset) {
             reset();
-        }else if (receivedCommand instanceof CommandMessage) {
+        } else if (receivedCommand instanceof CommandMessage) {
             TYPE type = ((CommandMessage)receivedCommand).getType();
             if (TYPE.OK.equals(type)) {
                 // Do nothing, we just found out that we behaved correctly
@@ -70,33 +72,40 @@ public abstract class Protocol {
             }
         } else {
             // instead of responding with wrong command, throw exception
-            throw new ProtocolViolatedException("Command invalid", receivedCommand, lastCommand,commandAnnotation);
+            throw new ProtocolViolatedException("Command invalid", receivedCommand, lastCommand, commandAnnotation);
         }
         if (respCommand != null && validateResponse(respCommand)) {
             sender.sendCommand(respCommand);
         }
+        //reset protocol if we reached a terminal
+        if(retrieveAnnotation(receivedCommand, TerminalCommand.class)!=null){
+            reset();
+        }
         return respCommand;
     }
 
-    private void reset(){
+    private void reset() {
         reset(null);
     }
-    
+
     protected abstract Class[] getAcceptedCommands();
+
     protected abstract Class[] getAcceptedResponses();
-    
+
     /**
      * reset protocol and send reset command to the sender
-     * @param reset - reset command that will be sent to the other end
+     * 
+     * @param reset
+     *            - reset command that will be sent to the other end
      */
-    public void reset(CommandReset reset){
+    public void reset(CommandReset reset) {
         lastCommand = null;
-        if(reset!=null){
+        if (reset != null) {
             sender.sendCommand(reset);
         }
-        
+
     }
-    
+
     /**
      * A command is valid when it has the expected type based on the last
      * command sent and the command annotations
@@ -110,10 +119,20 @@ public abstract class Protocol {
             result = false;
         }
         if (receivedCommand instanceof CommandMessage) {
-            // accept any received
+            // accept any received message command
+            // TODO WHY TO ALWWAYS ACCEPT THEM ???
             return true;
         } else {
-            Object ann  = receivedCommand.getClass().getAnnotation(commandAnnotation);
+            if (lastCommand == null) {
+                // accept just StartCommand when this is the fist command
+                StartCommand ann = (StartCommand)retrieveAnnotation(receivedCommand, StartCommand.class);
+                if (ann != null) {
+                    result = true;
+                } else {
+                    result = false;
+                }
+            } else {
+                Object ann = retrieveAnnotation(receivedCommand, commandAnnotation);
                 if (ann != null) {
                     if (result) {
                         result = checkCurentCommandAgainstLast(receivedCommand.getClass());
@@ -121,6 +140,7 @@ public abstract class Protocol {
                 } else {
                     result = false;
                 }
+            }
         }
         return result;
     }
@@ -173,6 +193,11 @@ public abstract class Protocol {
             }
         }
         return false;
+    }
+
+    private Object retrieveAnnotation(Object object, Class annotationClass) {
+        Object ann = object.getClass().getAnnotation(annotationClass);
+        return ann;
     }
 
 }
