@@ -1,7 +1,7 @@
-package ro.develbox.commands.protocol;
+package ro.develbox.protocol;
 
 import ro.develbox.commands.Command;
-import ro.develbox.commands.protocol.exceptions.ProtocolViolatedException;
+import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 
 @SuppressWarnings("serial")
 public class ProtocolViolatedTestException extends ProtocolViolatedException {

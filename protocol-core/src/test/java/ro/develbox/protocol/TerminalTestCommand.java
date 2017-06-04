@@ -1,15 +1,16 @@
-package ro.develbox.commands.protocol;
+package ro.develbox.protocol;
 
-import ro.develbox.annotation.ClientCommand;
-import ro.develbox.annotation.ServerCommand;
+import ro.develbox.annotation.StartCommand;
+import ro.develbox.annotation.TerminalCommand;
 import ro.develbox.commands.Command;
 
-@ServerCommand
-@ClientCommand
-public class NonStartCommand extends Command{
+@TestAnnotation
+@StartCommand
+@TerminalCommand
+public class TerminalTestCommand extends Command{
 
-    public NonStartCommand() {
-        super("test");
+    public TerminalTestCommand() {
+        super("testTerminal");
     }
 
     @Override

@@ -1,23 +1,26 @@
-package ro.develbox.commands.protocol;
+package ro.develbox.protocol;
 
-import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.StartCommand;
 import ro.develbox.commands.Command;
 
-@ClientCommand
+@TestAnnotation
 @StartCommand
-public class ClientTypeTestCommand extends Command {
-    public ClientTypeTestCommand() {
+public class StartTestCommand extends Command{
+
+    public StartTestCommand() {
         super("test");
     }
 
     @Override
     public String toNetwork() {
+        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void fromNetwork(String networkRep) {
         // TODO Auto-generated method stub
+        
     }
+
 }

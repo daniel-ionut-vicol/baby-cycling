@@ -1,4 +1,4 @@
-package ro.develbox.commands.protocol;
+package ro.develbox.protocol;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -22,7 +22,12 @@ import ro.develbox.commands.CommandMessage.TYPE;
 import ro.develbox.commands.CommandReset;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
-import ro.develbox.commands.protocol.exceptions.ProtocolViolatedException;
+import ro.develbox.protocol.ClientProtocol;
+import ro.develbox.protocol.ICommandSender;
+import ro.develbox.protocol.IProtocolResponse;
+import ro.develbox.protocol.Protocol;
+import ro.develbox.protocol.ServerProtocol;
+import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 
 @SuppressWarnings({ "rawtypes" })
 public class ProtocolTest {

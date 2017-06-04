@@ -1,4 +1,4 @@
-package ro.develbox.commands.protocol;
+package ro.develbox.protocol;
 
 import ro.develbox.annotation.StartCommand;
 import ro.develbox.annotation.TerminalCommand;
@@ -8,7 +8,7 @@ import ro.develbox.commands.CommandMessage.TYPE;
 import ro.develbox.commands.CommandReset;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
-import ro.develbox.commands.protocol.exceptions.ProtocolViolatedException;
+import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 
 /**
  * implementing the protocol based on command annotations

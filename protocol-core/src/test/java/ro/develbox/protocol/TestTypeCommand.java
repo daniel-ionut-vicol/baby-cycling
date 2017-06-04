@@ -1,4 +1,4 @@
-package ro.develbox.commands.protocol;
+package ro.develbox.protocol;
 
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.ServerCommand;

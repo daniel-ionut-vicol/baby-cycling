@@ -1,28 +1,23 @@
-package ro.develbox.commands.protocol;
+package ro.develbox.protocol;
 
+import ro.develbox.annotation.ServerCommand;
 import ro.develbox.annotation.StartCommand;
-import ro.develbox.annotation.TerminalCommand;
 import ro.develbox.commands.Command;
 
-@TestAnnotation
+@ServerCommand
 @StartCommand
-@TerminalCommand
-public class TerminalTestCommand extends Command{
-
-    public TerminalTestCommand() {
-        super("testTerminal");
+public class ServerTypeTestCommand extends Command {
+    public ServerTypeTestCommand() {
+        super("test");
     }
 
     @Override
     public String toNetwork() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void fromNetwork(String networkRep) {
         // TODO Auto-generated method stub
-        
     }
-
 }

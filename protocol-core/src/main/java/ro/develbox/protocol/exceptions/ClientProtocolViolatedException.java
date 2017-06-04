@@ -1,12 +1,11 @@
-package ro.develbox.commands.protocol.exceptions;
+package ro.develbox.protocol.exceptions;
 
 import java.util.Arrays;
 
 import ro.develbox.annotation.ClientCommand;
-import ro.develbox.annotation.ServerCommand;
 import ro.develbox.commands.Command;
 
-public class ServerProtocolViolatedException extends ProtocolViolatedException {
+public class ClientProtocolViolatedException extends ProtocolViolatedException {
 
     /**
      * 
@@ -16,13 +15,13 @@ public class ServerProtocolViolatedException extends ProtocolViolatedException {
     protected Command command;
     protected Command prevCommand;
 
-    public ServerProtocolViolatedException(String cause, Command command, Command prevCommand) {
+    public ClientProtocolViolatedException(String cause, Command command, Command prevCommand) {
         super(cause, command, prevCommand);
     }
 
     @Override
     protected String describeCommand(Command command) {
-        ServerCommand annotation = command.getClass().getAnnotation(ServerCommand.class);
+        ClientCommand annotation = command.getClass().getAnnotation(ClientCommand.class);
         String annotationStr = null;
         if (annotation != null) {
             ClientCommand cc = (ClientCommand)annotation;

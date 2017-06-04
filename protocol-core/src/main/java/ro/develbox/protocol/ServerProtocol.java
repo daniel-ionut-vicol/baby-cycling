@@ -1,9 +1,9 @@
-package ro.develbox.commands.protocol;
+package ro.develbox.protocol;
 
 import ro.develbox.annotation.ServerCommand;
 import ro.develbox.commands.Command;
-import ro.develbox.commands.protocol.exceptions.ProtocolViolatedException;
-import ro.develbox.commands.protocol.exceptions.ServerProtocolViolatedException;
+import ro.develbox.protocol.exceptions.ProtocolViolatedException;
+import ro.develbox.protocol.exceptions.ServerProtocolViolatedException;
 
 @SuppressWarnings("rawtypes")
 public class ServerProtocol extends Protocol {

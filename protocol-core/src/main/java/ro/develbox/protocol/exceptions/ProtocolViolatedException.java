@@ -1,4 +1,4 @@
-package ro.develbox.commands.protocol.exceptions;
+package ro.develbox.protocol.exceptions;
 
 import ro.develbox.annotation.StartCommand;
 import ro.develbox.annotation.TerminalCommand;

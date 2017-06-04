@@ -1,9 +1,9 @@
-package ro.develbox.commands.protocol;
+package ro.develbox.protocol;
 
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.commands.Command;
-import ro.develbox.commands.protocol.exceptions.ClientProtocolViolatedException;
-import ro.develbox.commands.protocol.exceptions.ProtocolViolatedException;
+import ro.develbox.protocol.exceptions.ClientProtocolViolatedException;
+import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 
 @SuppressWarnings("rawtypes")
 public class ClientProtocol extends Protocol {

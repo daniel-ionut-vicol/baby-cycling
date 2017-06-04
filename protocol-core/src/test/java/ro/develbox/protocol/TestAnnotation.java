@@ -1,4 +1,4 @@
-package ro.develbox.commands.protocol;
+package ro.develbox.protocol;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
