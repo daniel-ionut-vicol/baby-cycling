@@ -1,12 +1,17 @@
-package ro.develbox.protocol;
+package ro.develbox.protocol.client;
 
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.commands.Command;
+import ro.develbox.commands.exceptions.ErrorCommandException;
+import ro.develbox.commands.exceptions.WarnCommandException;
+import ro.develbox.protocol.ICommandSender;
+import ro.develbox.protocol.IProtocolResponse;
+import ro.develbox.protocol.Protocol;
 import ro.develbox.protocol.exceptions.ClientProtocolViolatedException;
 import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 
 @SuppressWarnings("rawtypes")
-public class ClientProtocol extends Protocol {
+public class ClientProtocol extends Protocol implements IClient{
 
     public ClientProtocol(IProtocolResponse responder, ICommandSender sender) {
         super(responder, sender, ClientCommand.class);
@@ -29,5 +34,29 @@ public class ClientProtocol extends Protocol {
             Command prevCommand) {
         return new ClientProtocolViolatedException(cause, command, prevCommand);
     }
+
+    @Override
+    public void commandClientReceived(Command command) throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
+        super.commandReceived(command);
+    }
+
+    @Override
+    public void errorReceived(Throwable e) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void connected() {
+        //TODO send auth
+    }
+
+    @Override
+    public void disconnected(String reason) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    
     
 }

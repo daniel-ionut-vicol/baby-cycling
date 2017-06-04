@@ -13,7 +13,11 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import ro.develbox.commands.Command;
 import ro.develbox.commands.ICommandContructor;
+import ro.develbox.commands.exceptions.ErrorCommandException;
+import ro.develbox.commands.exceptions.WarnCommandException;
 import ro.develbox.commands.string.CommandConstructorString;
+import ro.develbox.protocol.client.IClient;
+import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 
 public class WSClient extends WebSocketAdapter {
 
@@ -54,7 +58,18 @@ public class WSClient extends WebSocketAdapter {
         Command command = commandConstr.constructCommand(message);
         if (command != null) {
             for (IClient listener : listeners) {
-                listener.commandReceived(command);
+                try {
+                    listener.commandClientReceived(command);
+                } catch (WarnCommandException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (ErrorCommandException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (ProtocolViolatedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         }
     }

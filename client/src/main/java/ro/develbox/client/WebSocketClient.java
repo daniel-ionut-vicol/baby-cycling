@@ -5,9 +5,12 @@ import java.net.URI;
 
 import ro.develbox.commands.Command;
 import ro.develbox.commands.ICommandContructor;
-import ro.develbox.protocol.ClientProtocol;
+import ro.develbox.protocol.ICommandSender;
+import ro.develbox.protocol.IProtocolResponse;
+import ro.develbox.protocol.client.ClientProtocol;
+import ro.develbox.protocol.client.IClient;
 
-public class WebSocketClient implements IClient {
+public class WebSocketClient implements IClient, IProtocolResponse, ICommandSender{
 
     private WSClient wsClient;
     private ClientProtocol cProtocol;
@@ -27,10 +30,9 @@ public class WebSocketClient implements IClient {
     }
 
     @Override
-    public void commandReceived(Command command) {
+    public void commandClientReceived(Command command) {
         try {
             Command response = cProtocol.commandReceived(command);
-            sendCommand(response);
         } catch (Exception e) {
             redirectException(e);
         }

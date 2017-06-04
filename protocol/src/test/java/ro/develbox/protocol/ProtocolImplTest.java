@@ -16,7 +16,9 @@ import ro.develbox.commands.ServerTypeTestCommand;
 import ro.develbox.commands.TestTypeCommand;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
+import ro.develbox.protocol.client.ClientProtocol;
 import ro.develbox.protocol.exceptions.ProtocolViolatedException;
+import ro.develbox.protocol.server.ServerProtocol;
 
 public class ProtocolImplTest extends ProtocolTest{
 
@@ -43,7 +45,7 @@ public class ProtocolImplTest extends ProtocolTest{
             ProtocolViolatedException.class }, expectedExceptionsMessageRegExp = ".*Command invalid.*")
     public void testServerCommandRejectedOnClient() throws Exception {
         ClientProtocol clientP = new ClientProtocol(responder, sender);
-        clientP.commandReceived(new ServerTypeTestCommand());
+        clientP.commandClientReceived(new ServerTypeTestCommand());
     }
 
     @DataProvider(name = "comandValidationDp")
@@ -86,7 +88,7 @@ public class ProtocolImplTest extends ProtocolTest{
             }
         };
         Command received = new TestTypeCommand();
-        Command response = protocol.commandReceived(received);
+        Command response = protocol.commandClientReceived(received);
         assertTrue(response == responderCommand);
         assertTrue(protocol.lastCommand == received);
     }

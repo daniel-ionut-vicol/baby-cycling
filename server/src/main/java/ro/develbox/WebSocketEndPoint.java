@@ -21,8 +21,8 @@ import ro.develbox.commands.string.CommandConstructorString;
 import ro.develbox.model.User;
 import ro.develbox.protocol.ICommandSender;
 import ro.develbox.protocol.IProtocolResponse;
-import ro.develbox.protocol.ServerProtocol;
 import ro.develbox.protocol.exceptions.ProtocolViolatedException;
+import ro.develbox.protocol.server.ServerProtocol;
 
 @ServerEndpoint(value = "/cyclingWSE")
 public class WebSocketEndPoint implements ICommandSender, IProtocolResponse {
