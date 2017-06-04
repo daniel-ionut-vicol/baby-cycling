@@ -1,6 +1,9 @@
 package ro.develbox.commands.protocol;
 
 import ro.develbox.annotation.ClientCommand;
+import ro.develbox.commands.Command;
+import ro.develbox.commands.protocol.exceptions.ClientProtocolViolatedException;
+import ro.develbox.commands.protocol.exceptions.ProtocolViolatedException;
 
 @SuppressWarnings("rawtypes")
 public class ClientProtocol extends Protocol {
@@ -19,6 +22,12 @@ public class ClientProtocol extends Protocol {
     protected Class[] getAcceptedResponses() {
         ClientCommand last = (ClientCommand)lastCommand.getClass().getAnnotation(ClientCommand.class);
         return last.responseCommandType();
+    }
+
+    @Override
+    protected ProtocolViolatedException getProtocolViolatedException(String cause, Command command,
+            Command prevCommand) {
+        return new ClientProtocolViolatedException(cause, command, prevCommand);
     }
     
 }

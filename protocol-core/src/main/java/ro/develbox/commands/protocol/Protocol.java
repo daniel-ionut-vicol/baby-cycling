@@ -53,7 +53,7 @@ public abstract class Protocol {
             throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
         Command respCommand = null;
         if (receivedCommand == null) {
-            throw new ProtocolViolatedException("Null command", receivedCommand, lastCommand, commandAnnotation);
+            throw getProtocolViolatedException("Null command", receivedCommand, lastCommand);
         } else if (receivedCommand instanceof CommandReset) {
             reset();
         } else if (receivedCommand instanceof CommandMessage) {
@@ -72,7 +72,7 @@ public abstract class Protocol {
             }
         } else {
             // instead of responding with wrong command, throw exception
-            throw new ProtocolViolatedException("Command invalid", receivedCommand, lastCommand, commandAnnotation);
+            throw getProtocolViolatedException("Command invalid", receivedCommand, lastCommand);
         }
         if (respCommand != null && validateResponse(respCommand)) {
             sender.sendCommand(respCommand);
@@ -95,6 +95,8 @@ public abstract class Protocol {
     protected abstract Class[] getAcceptedCommands();
 
     protected abstract Class[] getAcceptedResponses();
+    
+    protected abstract ProtocolViolatedException getProtocolViolatedException(String cause, Command command, Command prevCommand);
 
     /**
      * reset protocol and send reset command to the sender

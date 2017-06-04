@@ -14,7 +14,6 @@ import org.testng.annotations.Test;
 import mockit.Expectations;
 import mockit.Mocked;
 import mockit.Verifications;
-import mockit.internal.expectations.TestOnlyPhase;
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.ServerCommand;
 import ro.develbox.commands.Command;
@@ -66,6 +65,12 @@ public class ProtocolTest {
 
             @Override
             protected Class[] getAcceptedResponses() {
+                return null;
+            }
+
+            @Override
+            protected ProtocolViolatedException getProtocolViolatedException(String cause, Command command,
+                    Command prevCommand) {
                 return null;
             }
         };
@@ -261,6 +266,10 @@ public class ProtocolTest {
             @Override
             protected Class[] getAcceptedResponses() {
                 return accResp;
+            }
+            
+            protected ProtocolViolatedException getProtocolViolatedException(String cause, Command command, Command prevCommand){
+                return new ProtocolViolatedTestException(cause, command, prevCommand);
             }
         };
         return protocol;
