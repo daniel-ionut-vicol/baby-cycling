@@ -4,6 +4,10 @@ import ro.develbox.commands.Command;
 
 public abstract class CommandException extends Exception {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private Command command;
 
     public CommandException(Command command) {

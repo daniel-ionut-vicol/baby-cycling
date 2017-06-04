@@ -2,6 +2,7 @@ package ro.develbox.commands.protocol;
 
 import ro.develbox.annotation.ServerCommand;
 
+@SuppressWarnings("rawtypes")
 public class ServerProtocol extends Protocol {
 
     public ServerProtocol(IProtocolResponse responder, ICommandSender sender) {
