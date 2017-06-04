@@ -1,5 +1,7 @@
 dependencies {
 	
     compile project (':protocol-core')
+	
+	testCompile project(':protocol-core').sourceSets.test.output
 
 }
