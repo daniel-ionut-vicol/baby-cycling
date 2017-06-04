@@ -16,10 +16,17 @@ import mockit.Mocked;
 import mockit.Verifications;
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.ServerCommand;
+import ro.develbox.annotation.TestAnnotation;
+import ro.develbox.commands.ClientTypeTestCommand;
 import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandMessage;
 import ro.develbox.commands.CommandMessage.TYPE;
 import ro.develbox.commands.CommandReset;
+import ro.develbox.commands.NonStartCommand;
+import ro.develbox.commands.ServerTypeTestCommand;
+import ro.develbox.commands.StartTestCommand;
+import ro.develbox.commands.TerminalTestCommand;
+import ro.develbox.commands.TestTypeCommand;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
 import ro.develbox.protocol.ClientProtocol;
@@ -28,6 +35,7 @@ import ro.develbox.protocol.IProtocolResponse;
 import ro.develbox.protocol.Protocol;
 import ro.develbox.protocol.ServerProtocol;
 import ro.develbox.protocol.exceptions.ProtocolViolatedException;
+import ro.develbox.protocol.exceptions.ProtocolViolatedTestException;
 
 @SuppressWarnings({ "rawtypes" })
 public class ProtocolTest {

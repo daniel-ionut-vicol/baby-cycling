@@ -1,4 +1,4 @@
-package ro.develbox.protocol;
+package ro.develbox.protocol.exceptions;
 
 import ro.develbox.commands.Command;
 import ro.develbox.protocol.exceptions.ProtocolViolatedException;

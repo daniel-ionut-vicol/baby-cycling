@@ -1,7 +1,8 @@
-package ro.develbox.protocol;
+package ro.develbox.commands;
 
 import ro.develbox.annotation.StartCommand;
 import ro.develbox.annotation.TerminalCommand;
+import ro.develbox.annotation.TestAnnotation;
 import ro.develbox.commands.Command;
 
 @TestAnnotation

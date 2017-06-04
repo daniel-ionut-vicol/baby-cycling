@@ -1,17 +1,14 @@
-package ro.develbox.protocol;
+package ro.develbox.commands;
 
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.ServerCommand;
-import ro.develbox.annotation.StartCommand;
 import ro.develbox.commands.Command;
 
-@ClientCommand(nextCommandType={TestTypeCommand.class},responseCommandType={TestTypeCommand.class})
-@ServerCommand(nextCommandType={TestTypeCommand.class},responseCommandType={TestTypeCommand.class})
-@TestAnnotation
-@StartCommand
-public class TestTypeCommand extends Command{
+@ServerCommand
+@ClientCommand
+public class NonStartCommand extends Command{
 
-    public TestTypeCommand() {
+    public NonStartCommand() {
         super("test");
     }
 

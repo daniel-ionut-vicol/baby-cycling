@@ -5,7 +5,7 @@ import java.net.URI;
 
 import ro.develbox.commands.Command;
 import ro.develbox.commands.ICommandContructor;
-import ro.develbox.commands.protocol.ClientProtocol;
+import ro.develbox.protocol.ClientProtocol;
 
 public class WebSocketClient implements IClient {
 

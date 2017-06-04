@@ -17,12 +17,12 @@ import ro.develbox.commands.CommandRegister;
 import ro.develbox.commands.ICommandContructor;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
-import ro.develbox.commands.protocol.ICommandSender;
-import ro.develbox.commands.protocol.IProtocolResponse;
-import ro.develbox.commands.protocol.ServerProtocol;
-import ro.develbox.commands.protocol.exceptions.ProtocolViolatedException;
 import ro.develbox.commands.string.CommandConstructorString;
 import ro.develbox.model.User;
+import ro.develbox.protocol.ICommandSender;
+import ro.develbox.protocol.IProtocolResponse;
+import ro.develbox.protocol.ServerProtocol;
+import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 
 @ServerEndpoint(value = "/cyclingWSE")
 public class WebSocketEndPoint implements ICommandSender, IProtocolResponse {

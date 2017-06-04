@@ -1,8 +1,8 @@
 package ro.develbox.client;
 
 import ro.develbox.commands.Command;
-import ro.develbox.commands.protocol.ICommandSender;
-import ro.develbox.commands.protocol.IProtocolResponse;
+import ro.develbox.protocol.ICommandSender;
+import ro.develbox.protocol.IProtocolResponse;
 
 public interface IClient extends IProtocolResponse, ICommandSender {
 
