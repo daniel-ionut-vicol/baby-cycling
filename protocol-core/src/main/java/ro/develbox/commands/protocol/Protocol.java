@@ -76,6 +76,10 @@ public abstract class Protocol {
         }
         if (respCommand != null && validateResponse(respCommand)) {
             sender.sendCommand(respCommand);
+            //reset protocol if we sent a terminal
+            if(retrieveAnnotation(respCommand, TerminalCommand.class)!=null){
+                reset();
+            }
         }
         //reset protocol if we reached a terminal
         if(retrieveAnnotation(receivedCommand, TerminalCommand.class)!=null){
@@ -131,15 +135,14 @@ public abstract class Protocol {
                 } else {
                     result = false;
                 }
-            } else {
-                Object ann = retrieveAnnotation(receivedCommand, commandAnnotation);
-                if (ann != null) {
-                    if (result) {
-                        result = checkCurentCommandAgainstLast(receivedCommand.getClass());
-                    }
-                } else {
-                    result = false;
+            }
+            Object ann = retrieveAnnotation(receivedCommand, commandAnnotation);
+            if (ann != null) {
+                if (result) {
+                    result = result && checkCurentCommandAgainstLast(receivedCommand.getClass());
                 }
+            } else {
+                result = false;
             }
         }
         return result;

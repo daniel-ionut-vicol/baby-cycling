@@ -50,7 +50,7 @@ public class ProtocolViolatedException extends Exception {
                 annotationStr = " next command : "
                     + Arrays.toString(sc.nextCommandType()) + ",response :"
                     + Arrays.toString(sc.responseCommandType());
-            }else if(annotation instanceof ServerCommand){
+            }else if(annotation instanceof ClientCommand){
                 ClientCommand cc = (ClientCommand) annotation;
                 annotationStr = " next command : "
                     + Arrays.toString(cc.nextCommandType()) + ",response :"

@@ -1,9 +1,11 @@
 package ro.develbox.commands.protocol;
 
 import ro.develbox.annotation.ServerCommand;
+import ro.develbox.annotation.StartCommand;
 import ro.develbox.commands.Command;
 
 @ServerCommand
+@StartCommand
 public class ServerTypeTestCommand extends Command {
     public ServerTypeTestCommand() {
         super("test");
