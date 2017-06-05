@@ -88,7 +88,7 @@ public class ProtocolImplTest extends ProtocolTest{
             }
         };
         Command received = new TestTypeCommand();
-        Command response = protocol.commandClientReceived(received);
+        Command response = protocol.commandReceived(received);
         assertTrue(response == responderCommand);
         assertTrue(protocol.lastCommand == received);
     }
