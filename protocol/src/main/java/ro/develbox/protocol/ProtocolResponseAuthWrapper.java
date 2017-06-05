@@ -22,7 +22,7 @@ public class ProtocolResponseAuthWrapper implements IProtocolResponse{
         if(command instanceof CommandAuth){
             authenticated = authenticate((CommandAuth)command);
             if(authenticated){
-                return commandConstrutor.constructCommand(CommandAuth.COMMAND);
+                return commandConstrutor.contructMessageCommand(TYPE.OK, "Authenticated");
             }else{
                 return commandConstrutor.contructMessageCommand(TYPE.ERROR, "CHEATER!!!");
             }
@@ -33,7 +33,7 @@ public class ProtocolResponseAuthWrapper implements IProtocolResponse{
         return wrapped.getCommandResponse(command);
     }
 
-    private boolean authenticate(CommandAuth auth){
+    protected boolean authenticate(CommandAuth auth){
         //do some logic here
         return true;
     }

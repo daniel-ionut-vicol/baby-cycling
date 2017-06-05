@@ -2,6 +2,7 @@ package ro.develbox.protocol.client;
 
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.commands.Command;
+import ro.develbox.commands.CommandAuth;
 import ro.develbox.commands.CommandConstructorInstance;
 import ro.develbox.protocol.ICommandSender;
 import ro.develbox.protocol.IProtocolResponse;
@@ -44,8 +45,10 @@ public class ClientProtocol extends NetworkProtocol{
     }
 
     @Override
-    public void connected() {
-        // TODO send auth
+    protected void afterConnected() {
+        CommandAuth auth = (CommandAuth)commandConstructor.createCommandInstance(CommandAuth.COMMAND);
+        //TODO set auth key
+        sender.sendCommand(auth);
     }
 
     @Override

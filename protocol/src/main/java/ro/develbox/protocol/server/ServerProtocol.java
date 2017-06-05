@@ -2,6 +2,7 @@ package ro.develbox.protocol.server;
 
 import ro.develbox.annotation.ServerCommand;
 import ro.develbox.commands.Command;
+import ro.develbox.commands.CommandAuth;
 import ro.develbox.commands.CommandConstructorInstance;
 import ro.develbox.protocol.ICommandSender;
 import ro.develbox.protocol.IProtocolResponse;
@@ -39,12 +40,13 @@ public class ServerProtocol extends NetworkProtocol{
     @Override
     public void errorReceived(Throwable e) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
-    public void connected() {
-        // TODO send auth
+    protected void afterConnected() {
+        CommandAuth auth = (CommandAuth)commandConstructor.createCommandInstance(CommandAuth.COMMAND);
+        //TODO set auth key
+        sender.sendCommand(auth);
     }
 
     @Override
