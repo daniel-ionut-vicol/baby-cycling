@@ -17,7 +17,7 @@ import ro.develbox.protocol.exceptions.ProtocolViolatedException;
  *
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public abstract class Protocol {
+public abstract class Protocol implements ICommandReceiver{
 
     protected IProtocolResponse responder;
     protected ICommandSender sender;
