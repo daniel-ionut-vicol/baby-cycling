@@ -30,7 +30,7 @@ public class ProtocolImplTest extends ProtocolTest{
 
     @Test
     public void testClientProtocolConstructor() {
-        Protocol clientP = new ClientProtocol(responder, sender);
+        Protocol clientP = new ClientProtocol(responder,sender);
         Assert.assertTrue(clientP.commandAnnotation == ClientCommand.class);
     }
 
@@ -44,18 +44,18 @@ public class ProtocolImplTest extends ProtocolTest{
     @Test(expectedExceptions = {
             ProtocolViolatedException.class }, expectedExceptionsMessageRegExp = ".*Command invalid.*")
     public void testServerCommandRejectedOnClient() throws Exception {
-        ClientProtocol clientP = new ClientProtocol(responder, sender);
+        ClientProtocol clientP = new ClientProtocol(responder,sender);
         clientP.commandReceived(new ServerTypeTestCommand());
     }
 
     @DataProvider(name = "comandValidationDp")
     public Object[][] comandValidationDp() {
         return new Object[][] { { new ServerProtocol(responder, sender), new ClientTypeTestCommand() },
-                { new ClientProtocol(responder, sender), new ServerTypeTestCommand() } };
+                { new ClientProtocol(responder,sender), new ServerTypeTestCommand() } };
     }
 
     @Test(dataProvider = "comandValidationDp")
-    public void testNextExpectedCommandGoodValidation(Protocol protocol, Command badCommand)
+    public void testNextExpectedCommandGoodValidation(NetworkProtocol protocol, Command badCommand)
             throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
         TestTypeCommand command = new TestTypeCommand();
         protocol.lastCommand = command;
@@ -64,7 +64,7 @@ public class ProtocolImplTest extends ProtocolTest{
     }
     
     @Test(dataProvider = "comandValidationDp")
-    public void testResponseCommandValidation(Protocol protocol, Command badCommand) {
+    public void testResponseCommandValidation(NetworkProtocol protocol, Command badCommand) {
         TestTypeCommand command = new TestTypeCommand();
         protocol.lastCommand = command;
         assertTrue(protocol.validateResponse(command));
@@ -74,11 +74,11 @@ public class ProtocolImplTest extends ProtocolTest{
 
     @DataProvider(name = "protocolImpls")
     public Object[][] protocolImpls() {
-        return new Object[][] { { new ServerProtocol(responder, sender) }, { new ClientProtocol(responder, sender) } };
+        return new Object[][] { { new ServerProtocol(responder, sender) }, { new ClientProtocol(responder,sender) } };
     }
 
     @Test(dataProvider = "protocolImpls")
-    public void testCommandReceived(Protocol protocol)
+    public void testCommandReceived(NetworkProtocol protocol)
             throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
 
         new Expectations(sender) {

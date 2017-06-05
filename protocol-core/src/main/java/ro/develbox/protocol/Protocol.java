@@ -6,6 +6,7 @@ import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandMessage;
 import ro.develbox.commands.CommandMessage.TYPE;
 import ro.develbox.commands.CommandReset;
+import ro.develbox.commands.ICommandContructor;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
 import ro.develbox.protocol.exceptions.ProtocolViolatedException;
@@ -21,6 +22,7 @@ public abstract class Protocol implements ICommandReceiver{
 
     protected IProtocolResponse responder;
     protected ICommandSender sender;
+    protected ICommandContructor commandConstructor;
 
     protected Command lastCommand;
 
@@ -29,9 +31,10 @@ public abstract class Protocol implements ICommandReceiver{
      */
     protected Class commandAnnotation;
 
-    protected Protocol(IProtocolResponse responder, ICommandSender sender, Class commandAnnotation) {
+    protected Protocol(IProtocolResponse responder, ICommandSender sender, ICommandContructor commandConstructor, Class commandAnnotation) {
         this.responder = responder;
         this.sender = sender;
+        this.commandConstructor = commandConstructor;
         this.commandAnnotation = commandAnnotation;
     }
 

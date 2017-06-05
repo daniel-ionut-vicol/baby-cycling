@@ -13,4 +13,5 @@ public interface ICommandContructor {
 
     public CommandMessage contructMessageCommand(TYPE type, String message);
 
+    public Command createCommandInstance(String commandName);
 }

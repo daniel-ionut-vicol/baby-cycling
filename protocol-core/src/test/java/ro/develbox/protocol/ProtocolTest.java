@@ -59,7 +59,7 @@ public class ProtocolTest {
 
     @Test
     public void testProtocolConstructor() {
-        Protocol protocol = new Protocol(responder, sender, ClientCommand.class) {
+        Protocol protocol = new Protocol(responder, sender,null, ClientCommand.class) {
 
             @Override
             protected Class[] getAcceptedCommands() {
@@ -228,7 +228,7 @@ public class ProtocolTest {
 
     private Protocol createProtocol(IProtocolResponse responder, ICommandSender sender, final Class[] accReqs,
             final Class[] accResp) {
-        Protocol protocol = new Protocol(responder, sender, TestAnnotation.class) {
+        Protocol protocol = new Protocol(responder, sender,null, TestAnnotation.class) {
 
             @Override
             protected Class[] getAcceptedCommands() {

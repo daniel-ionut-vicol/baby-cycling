@@ -2,18 +2,21 @@ package ro.develbox.protocol.client;
 
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.commands.Command;
+import ro.develbox.commands.CommandConstructorInstance;
 import ro.develbox.protocol.ICommandSender;
-import ro.develbox.protocol.INetworkCommandReceiver;
 import ro.develbox.protocol.IProtocolResponse;
-import ro.develbox.protocol.Protocol;
+import ro.develbox.protocol.NetworkProtocol;
+import ro.develbox.protocol.ProtocolResponseAuthWrapper;
 import ro.develbox.protocol.exceptions.ClientProtocolViolatedException;
 import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 
 @SuppressWarnings("rawtypes")
-public class ClientProtocol extends Protocol implements INetworkCommandReceiver{
+public class ClientProtocol extends NetworkProtocol{
 
     public ClientProtocol(IProtocolResponse responder, ICommandSender sender) {
-        super(responder, sender, ClientCommand.class);
+
+        super(new ProtocolResponseAuthWrapper(responder, CommandConstructorInstance.commandConstructor), sender,
+                CommandConstructorInstance.commandConstructor, ClientCommand.class);
     }
 
     @Override
@@ -37,20 +40,18 @@ public class ClientProtocol extends Protocol implements INetworkCommandReceiver{
     @Override
     public void errorReceived(Throwable e) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void connected() {
-        //TODO send auth
+        // TODO send auth
     }
 
     @Override
     public void disconnected(String reason) {
         // TODO Auto-generated method stub
-        
+
     }
-    
-    
-    
+
 }

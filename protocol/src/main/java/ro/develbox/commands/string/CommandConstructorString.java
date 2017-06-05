@@ -43,4 +43,21 @@ public class CommandConstructorString implements ICommandContructor {
         return new CommandMessageString();
     }
 
+    @Override
+    public Command createCommandInstance(String commandName) {
+        Command command = null;
+        if (commandName.equals(CommandLogin.COMMAND)) {
+            command = new CommandLoginString();
+        } else if (commandName.equals(CommandRegister.COMMAND)) {
+            command = new CommandRegisterString();
+        } else if (commandName.equals(CommandAuthString.COMMAND)) {
+            command = new CommandAuthString();
+        } else if (commandName.equals(CommandMessage.COMMAND)) {
+            command = new CommandMessageString();
+        }
+        return command;
+    }
+    
+    
+
 }
