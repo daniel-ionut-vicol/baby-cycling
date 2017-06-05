@@ -2,16 +2,15 @@ package ro.develbox.protocol.client;
 
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.commands.Command;
-import ro.develbox.commands.exceptions.ErrorCommandException;
-import ro.develbox.commands.exceptions.WarnCommandException;
 import ro.develbox.protocol.ICommandSender;
+import ro.develbox.protocol.INetworkCommandReceiver;
 import ro.develbox.protocol.IProtocolResponse;
 import ro.develbox.protocol.Protocol;
 import ro.develbox.protocol.exceptions.ClientProtocolViolatedException;
 import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 
 @SuppressWarnings("rawtypes")
-public class ClientProtocol extends Protocol implements IClient{
+public class ClientProtocol extends Protocol implements INetworkCommandReceiver{
 
     public ClientProtocol(IProtocolResponse responder, ICommandSender sender) {
         super(responder, sender, ClientCommand.class);
@@ -33,11 +32,6 @@ public class ClientProtocol extends Protocol implements IClient{
     protected ProtocolViolatedException getProtocolViolatedException(String cause, Command command,
             Command prevCommand) {
         return new ClientProtocolViolatedException(cause, command, prevCommand);
-    }
-
-    @Override
-    public void commandClientReceived(Command command) throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
-        super.commandReceived(command);
     }
 
     @Override

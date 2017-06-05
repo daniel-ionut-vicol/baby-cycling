@@ -45,7 +45,7 @@ public class ProtocolImplTest extends ProtocolTest{
             ProtocolViolatedException.class }, expectedExceptionsMessageRegExp = ".*Command invalid.*")
     public void testServerCommandRejectedOnClient() throws Exception {
         ClientProtocol clientP = new ClientProtocol(responder, sender);
-        clientP.commandClientReceived(new ServerTypeTestCommand());
+        clientP.commandReceived(new ServerTypeTestCommand());
     }
 
     @DataProvider(name = "comandValidationDp")

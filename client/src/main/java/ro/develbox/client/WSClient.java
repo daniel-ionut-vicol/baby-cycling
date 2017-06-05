@@ -15,8 +15,7 @@ import ro.develbox.commands.Command;
 import ro.develbox.commands.ICommandContructor;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
-import ro.develbox.commands.string.CommandConstructorString;
-import ro.develbox.protocol.client.IClient;
+import ro.develbox.protocol.INetworkCommandReceiver;
 import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 
 public class WSClient extends WebSocketAdapter {
@@ -27,7 +26,7 @@ public class WSClient extends WebSocketAdapter {
 
     private URI uri;
 
-    private List<IClient> listeners;
+    private List<INetworkCommandReceiver> listeners;
     
     ICommandContructor commandConstr ;
 
@@ -57,9 +56,9 @@ public class WSClient extends WebSocketAdapter {
         // logic for creating command
         Command command = commandConstr.constructCommand(message);
         if (command != null) {
-            for (IClient listener : listeners) {
+            for (INetworkCommandReceiver listener : listeners) {
                 try {
-                    listener.commandClientReceived(command);
+                    listener.commandReceived(command);
                 } catch (WarnCommandException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -77,7 +76,7 @@ public class WSClient extends WebSocketAdapter {
     @Override
     public void onWebSocketConnect(Session sess) {
         super.onWebSocketConnect(sess);
-        for (IClient listener : listeners) {
+        for (INetworkCommandReceiver listener : listeners) {
             listener.connected();
         }
     }
@@ -90,14 +89,14 @@ public class WSClient extends WebSocketAdapter {
     @Override
     public void onWebSocketClose(int statusCode, String reason) {
         super.onWebSocketClose(statusCode, reason);
-        for (IClient listener : listeners) {
+        for (INetworkCommandReceiver listener : listeners) {
             listener.disconnected(reason);
         }
     }
 
     @Override
     public void onWebSocketError(Throwable cause) {
-        for (IClient listener : listeners) {
+        for (INetworkCommandReceiver listener : listeners) {
             listener.errorReceived(cause);
         }
     }
@@ -110,13 +109,13 @@ public class WSClient extends WebSocketAdapter {
         }
     }
 
-    public void addListener(IClient listener) {
+    public void addListener(INetworkCommandReceiver listener) {
         if (listener != null) {
             listeners.add(listener);
         }
     }
 
-    public void removeListener(IClient listener) {
+    public void removeListener(INetworkCommandReceiver listener) {
         if (listener != null) {
             listeners.remove(listener);
         }
