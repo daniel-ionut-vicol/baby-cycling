@@ -5,8 +5,8 @@ allprojects{
 }
 
 dependencies {
-    compile project (':client')
-    compile project (':server')
+    compile project (':web.sock.client')
+    compile project (':web.sock.server')
 }
 
 subprojects {
