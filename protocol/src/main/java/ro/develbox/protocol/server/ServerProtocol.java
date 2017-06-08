@@ -12,7 +12,7 @@ import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 import ro.develbox.protocol.exceptions.ServerProtocolViolatedException;
 
 @SuppressWarnings("rawtypes")
-public class ServerProtocol extends NetworkProtocol{
+public abstract class ServerProtocol extends NetworkProtocol{
 
     public ServerProtocol(IProtocolResponse responder, ICommandSender sender) {
         super(new ProtocolResponseAuthWrapper(responder, CommandConstructorInstance.commandConstructor), sender,
@@ -20,19 +20,19 @@ public class ServerProtocol extends NetworkProtocol{
     }
 
     @Override
-    protected Class[] getAcceptedCommands() {
+    final protected Class[] getAcceptedCommands() {
         ServerCommand last = (ServerCommand)lastCommand.getClass().getAnnotation(ServerCommand.class);
         return last.nextCommandType();
     }
 
     @Override
-    protected Class[] getAcceptedResponses() {
+    final protected Class[] getAcceptedResponses() {
         ServerCommand last = (ServerCommand)lastCommand.getClass().getAnnotation(ServerCommand.class);
         return last.responseCommandType();
     }
 
     @Override
-    protected ProtocolViolatedException getProtocolViolatedException(String cause, Command command,
+    final protected ProtocolViolatedException getProtocolViolatedException(String cause, Command command,
             Command prevCommand) {
         return new ServerProtocolViolatedException(cause, command, prevCommand);
     }
@@ -43,7 +43,7 @@ public class ServerProtocol extends NetworkProtocol{
     }
 
     @Override
-    protected void afterConnected() {
+    final protected void afterConnected() {
         CommandAuth auth = (CommandAuth)commandConstructor.createCommandInstance(CommandAuth.COMMAND);
         //TODO set auth key
         sender.sendCommand(auth);
