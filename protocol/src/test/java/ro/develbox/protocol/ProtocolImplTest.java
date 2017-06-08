@@ -26,34 +26,34 @@ public class ProtocolImplTest extends ProtocolTest {
 
     @Test
     public void testServerProtocolConstructor() {
-        Protocol serverP = new ServerProtocol(responder, sender);
+        Protocol serverP = new ServerProtocol(responder, sender){};
         Assert.assertTrue(serverP.commandAnnotation == ServerCommand.class);
     }
 
     @Test
     public void testClientProtocolConstructor() {
-        Protocol clientP = new ClientProtocol(responder, sender);
+        Protocol clientP = new ClientProtocol(responder, sender){};
         Assert.assertTrue(clientP.commandAnnotation == ClientCommand.class);
     }
 
     @Test(expectedExceptions = {
             ProtocolViolatedException.class }, expectedExceptionsMessageRegExp = ".*Command invalid.*")
     public void testClientCommandRejectedOnServer() throws Exception {
-        ServerProtocol serverP = new ServerProtocol(responder, sender);
+        ServerProtocol serverP = new ServerProtocol(responder, sender){};
         serverP.commandReceived(new ClientTypeTestCommand());
     }
 
     @Test(expectedExceptions = {
             ProtocolViolatedException.class }, expectedExceptionsMessageRegExp = ".*Command invalid.*")
     public void testServerCommandRejectedOnClient() throws Exception {
-        ClientProtocol clientP = new ClientProtocol(responder, sender);
+        ClientProtocol clientP = new ClientProtocol(responder, sender){};
         clientP.commandReceived(new ServerTypeTestCommand());
     }
 
     @DataProvider(name = "comandValidationDp")
     public Object[][] comandValidationDp() {
-        return new Object[][] { { new ServerProtocol(responder, sender), new ClientTypeTestCommand() },
-                { new ClientProtocol(responder, sender), new ServerTypeTestCommand() } };
+        return new Object[][] { { new ServerProtocol(responder, sender){}, new ClientTypeTestCommand() },
+                { new ClientProtocol(responder, sender){}, new ServerTypeTestCommand() } };
     }
 
     @Test(dataProvider = "comandValidationDp")
@@ -75,7 +75,7 @@ public class ProtocolImplTest extends ProtocolTest {
 
     @DataProvider(name = "protocolImpls")
     public Object[][] protocolImpls() {
-        return new Object[][] { { new ServerProtocol(responder, sender) }, { new ClientProtocol(responder, sender) } };
+        return new Object[][] { { new ServerProtocol(responder, sender){} }, { new ClientProtocol(responder, sender){} } };
     }
 
     @Test(dataProvider = "protocolImpls", expectedExceptions = {
