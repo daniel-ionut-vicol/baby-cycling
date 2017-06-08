@@ -1,5 +1,7 @@
+include 'protocol.client'
 include 'web.sock.client'
 include 'persistent'
-include 'protocol-core'
+include 'protocol.core'
 include 'protocol'
+include 'protocol.server'
 include 'web.sock.server'

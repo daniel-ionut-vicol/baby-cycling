@@ -1,5 +1,5 @@
 dependencies {
-	compile project (':protocol')
+	compile project (':protocol.client')
 
 	compile 'org.eclipse.jetty.websocket:javax-websocket-client-impl:9.1.0.M0'
 }
