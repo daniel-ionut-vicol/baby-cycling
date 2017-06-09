@@ -18,10 +18,9 @@ import ro.develbox.protocol.exceptions.ProtocolViolatedException;
  *
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public abstract class Protocol implements ICommandReceiver{
+public abstract class Protocol{
 
     protected IProtocolResponse responder;
-    protected ICommandSender sender;
     protected ICommandContructor commandConstructor;
 
     protected Command lastCommand;
@@ -31,9 +30,8 @@ public abstract class Protocol implements ICommandReceiver{
      */
     protected Class commandAnnotation;
 
-    protected Protocol(IProtocolResponse responder, ICommandSender sender, ICommandContructor commandConstructor, Class commandAnnotation) {
+    protected Protocol(IProtocolResponse responder, ICommandContructor commandConstructor, Class commandAnnotation) {
         this.responder = responder;
-        this.sender = sender;
         this.commandConstructor = commandConstructor;
         this.commandAnnotation = commandAnnotation;
     }
@@ -78,7 +76,6 @@ public abstract class Protocol implements ICommandReceiver{
             throw getProtocolViolatedException("Command invalid", receivedCommand, lastCommand);
         }
         if (respCommand != null && validateResponse(respCommand)) {
-            sender.sendCommand(respCommand);
             //reset protocol if we sent a terminal
             if(retrieveAnnotation(respCommand, TerminalCommand.class)!=null){
                 reset();
@@ -92,7 +89,7 @@ public abstract class Protocol implements ICommandReceiver{
     }
 
     private void reset() {
-        reset(null);
+    	lastCommand = null;
     }
 
     protected abstract Class[] getAcceptedCommands();
@@ -100,20 +97,6 @@ public abstract class Protocol implements ICommandReceiver{
     protected abstract Class[] getAcceptedResponses();
     
     protected abstract ProtocolViolatedException getProtocolViolatedException(String cause, Command command, Command prevCommand);
-
-    /**
-     * reset protocol and send reset command to the sender
-     * 
-     * @param reset
-     *            - reset command that will be sent to the other end
-     */
-    public void reset(CommandReset reset) {
-        lastCommand = null;
-        if (reset != null) {
-            sender.sendCommand(reset);
-        }
-
-    }
 
     /**
      * A command is valid when it has the expected type based on the last

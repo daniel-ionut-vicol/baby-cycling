@@ -11,7 +11,6 @@ import org.testng.annotations.Test;
 
 import mockit.Expectations;
 import mockit.Mocked;
-import mockit.Verifications;
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.TestAnnotation;
 import ro.develbox.commands.Command;
@@ -31,7 +30,6 @@ import ro.develbox.protocol.exceptions.ProtocolViolatedTestException;
 public class ProtocolTest {
 
     IProtocolResponse responder;
-    ICommandSender sender;
 
     Command responderCommand;
 
@@ -48,18 +46,11 @@ public class ProtocolTest {
                 return responderCommand;
             }
         };
-        sender = new ICommandSender() {
-
-            @Override
-            public void sendCommand(Command command) {
-                // Do nothing
-            }
-        };
     }
 
     @Test
     public void testProtocolConstructor() {
-        Protocol protocol = new Protocol(responder, sender,null, ClientCommand.class) {
+        Protocol protocol = new Protocol(responder, null, ClientCommand.class) {
 
             @Override
             protected Class[] getAcceptedCommands() {
@@ -78,7 +69,6 @@ public class ProtocolTest {
             }
         };
         assertTrue(protocol.responder == responder);
-        assertTrue(protocol.sender == sender);
         assertTrue(protocol.commandAnnotation == ClientCommand.class);
     }
 
@@ -121,20 +111,6 @@ public class ProtocolTest {
         Protocol protocol = createProtocol();
         CommandMessage resp = createMessage(type);
         assertTrue(protocol.setNextExpectedType(resp) == result);
-    }
-
-    @Test
-    public void testReset(@Mocked final CommandReset reset, @Mocked final ICommandSender sender) {
-        Protocol protocol = createProtocol(sender);
-        protocol.reset(reset);
-
-        assertNull(protocol.lastCommand);
-        new Verifications() {
-            {
-                sender.sendCommand(reset);
-                times = 1;
-            }
-        };
     }
 
     @Test
@@ -211,24 +187,20 @@ public class ProtocolTest {
     }
 
     private Protocol createProtocol() {
-        return createProtocol(sender);
-    }
-
-    private Protocol createProtocol(ICommandSender sender) {
-        return createProtocol(responder, sender, null, null);
+        return createProtocol(responder, null, null);
     }
 
     private Protocol createProtocol(Class[] accReqs) {
-        return createProtocol(responder, sender, accReqs, null);
+        return createProtocol(responder, accReqs, null);
     }
 
     private Protocol createProtocol(IProtocolResponse responder, Class[] accResp) {
-        return createProtocol(responder, sender, null, accResp);
+        return createProtocol(responder, null, accResp);
     }
 
-    private Protocol createProtocol(IProtocolResponse responder, ICommandSender sender, final Class[] accReqs,
+    private Protocol createProtocol(IProtocolResponse responder, final Class[] accReqs,
             final Class[] accResp) {
-        Protocol protocol = new Protocol(responder, sender,null, TestAnnotation.class) {
+        Protocol protocol = new Protocol(responder, null, TestAnnotation.class) {
 
             @Override
             protected Class[] getAcceptedCommands() {
