@@ -21,7 +21,7 @@ public class WebSocketClient implements INetworkCommandReceiver, IProtocolRespon
         wsClient = new WSClient(uri,commandConstr);
         wsClient.connect();
         wsClient.addListener(this);
-        cProtocol = new ClientProtocol(this, this);
+        cProtocol = new ClientProtocol(this, this){};
     }
 
     @Override

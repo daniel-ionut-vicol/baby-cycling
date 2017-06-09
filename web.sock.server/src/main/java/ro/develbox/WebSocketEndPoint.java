@@ -38,7 +38,7 @@ public class WebSocketEndPoint implements ICommandSender, IProtocolResponse {
     public void onOpen(Session session) {
         System.out.println("Open");
         this.session = session;
-        serverProtocol = new ServerProtocol(this, this);
+        serverProtocol = new ServerProtocol(this, this){};
         authed = false;
     }
 
