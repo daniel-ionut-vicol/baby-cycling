@@ -17,6 +17,7 @@ import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandMessage;
 import ro.develbox.commands.CommandMessage.TYPE;
 import ro.develbox.commands.CommandReset;
+import ro.develbox.commands.ICommandContructor;
 import ro.develbox.commands.NonStartCommand;
 import ro.develbox.commands.StartTestCommand;
 import ro.develbox.commands.TerminalTestCommand;
@@ -45,6 +46,12 @@ public class ProtocolTest {
 
                 return responderCommand;
             }
+
+			@Override
+			public void setCommandConstr(ICommandContructor commandConstr) {
+				// TODO Auto-generated method stub
+				
+			}
         };
     }
 
@@ -76,7 +83,7 @@ public class ProtocolTest {
             ProtocolViolatedException.class }, expectedExceptionsMessageRegExp = ".*Null command.*")
     public void testNullCommandRejected() throws Exception {
         Protocol protocol = createProtocol();
-        protocol.commandReceived(null);
+        protocol.validateAndRespond(null);
     }
 
     @DataProvider(name = "testMessageCommandsData")
@@ -90,7 +97,7 @@ public class ProtocolTest {
         Protocol protocol = createProtocol();
         Command message = createMessage(type);
         try {
-            Command resp = protocol.commandReceived(message);
+            Command resp = protocol.validateAndRespond(message);
             if (expectedException == null) {
                 assertNull(resp);
             } else {
@@ -117,7 +124,7 @@ public class ProtocolTest {
     public void testResetReceived(@Mocked final CommandReset reset)
             throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
         Protocol protocol = createProtocol();
-        protocol.commandReceived(reset);
+        protocol.validateAndRespond(reset);
         assertNull(protocol.lastCommand);
     }
 
@@ -125,21 +132,21 @@ public class ProtocolTest {
     public void testCommandWithStartAccepted()
             throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
         Protocol protocol = createProtocol();
-        protocol.commandReceived(new StartTestCommand());
+        protocol.validateAndRespond(new StartTestCommand());
     }
 
     @Test(expectedExceptions = ProtocolViolatedException.class)
     public void testCommandWithoutStartRejected()
             throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
         Protocol protocol = createProtocol();
-        protocol.commandReceived(new NonStartCommand());
+        protocol.validateAndRespond(new NonStartCommand());
     }
 
     @Test
     public void testTerminalReceivedCommandReset()
             throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
         Protocol protocol = createProtocol();
-        protocol.commandReceived(new TerminalTestCommand());
+        protocol.validateAndRespond(new TerminalTestCommand());
         assertNull(protocol.lastCommand);
     }
 
@@ -156,7 +163,7 @@ public class ProtocolTest {
         };
         Class[] accresp = { TerminalTestCommand.class };
         Protocol protocol = createProtocol(responder, accresp);
-        protocol.commandReceived(received);
+        protocol.validateAndRespond(received);
         assertNull(protocol.lastCommand);
     }
 
@@ -165,7 +172,7 @@ public class ProtocolTest {
             throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
         Protocol protocol = createProtocol();
         protocol.lastCommand = new TestTypeCommand();
-        protocol.commandReceived(new TestTypeCommand());
+        protocol.validateAndRespond(new TestTypeCommand());
     }
 
     @Test(expectedExceptions = ProtocolViolatedException.class)
@@ -174,7 +181,7 @@ public class ProtocolTest {
         Class[] accepted = { ProtocolTest.class };
         Protocol protocol = createProtocol(accepted);
         protocol.lastCommand = new TestTypeCommand();
-        protocol.commandReceived(new TestTypeCommand());
+        protocol.validateAndRespond(new TestTypeCommand());
     }
 
     @Test
@@ -183,7 +190,7 @@ public class ProtocolTest {
         Class[] accepted = { TestTypeCommand.class };
         Protocol protocol = createProtocol(accepted);
         protocol.lastCommand = new TestTypeCommand();
-        protocol.commandReceived(new TestTypeCommand());
+        protocol.validateAndRespond(new TestTypeCommand());
     }
 
     private Protocol createProtocol() {

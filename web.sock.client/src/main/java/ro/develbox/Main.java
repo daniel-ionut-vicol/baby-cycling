@@ -2,24 +2,21 @@ package ro.develbox;
 
 import java.net.URI;
 
-import ro.develbox.client.WebSocketClient;
-import ro.develbox.commands.Command;
-import ro.develbox.commands.string.CommandAuthString;
-import ro.develbox.commands.string.CommandConstructorString;
-import ro.develbox.commands.string.CommandRegisterString;
+import ro.develbox.client.WSClientChannel;
 
 public class Main {
 
     public static void main(String[] args) {
-        String destUri = "ws://localhost:8080/Server/cyclingWSE";
+        String destUri = "ws://localhost:8080/web.sock.server/cyclingWSE";
 
         try {
             URI uri = new URI(destUri);
-            WebSocketClient client = new WebSocketClient(uri, null, new CommandConstructorString());
-            Command auth = new CommandAuthString();
-            Command register = new CommandRegisterString("nick", "email", "regId");
-            client.sendCommand(auth);
-            client.sendCommand(register);
+            WSClientChannel channel = new WSClientChannel(uri);
+            
+            ClientProtocolImpl client = new ClientProtocolImpl(channel);
+            client.connect();
+            channel.setCommandConstr(client.getCommandConstructor());
+            client.login("email","pass");
         } catch (Throwable t) {
             t.printStackTrace();
         } finally {

@@ -10,7 +10,7 @@ import ro.develbox.protocol.exceptions.ProtocolViolatedException;
  * @author vdi
  *
  */
-public class MockCommunication implements ICommandSender {
+public class MockCommunication implements ICommunicationChannel {
 
     private NetworkProtocol protocol ;
 
@@ -22,7 +22,7 @@ public class MockCommunication implements ICommandSender {
     @Override
     public void sendCommand(Command command) {
         try {
-            protocol.commandReceived(command);
+            protocol.validateAndRespond(command);
         } catch (WarnCommandException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -33,6 +33,23 @@ public class MockCommunication implements ICommandSender {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+    
+    @Override
+    public Command receiveCommand() {
+    	return null;
+    }
+    
+    @Override
+    public void connect() throws Exception {
+    	// TODO Auto-generated method stub
+    	
+    }
+    
+    @Override
+    public void disconnect() throws Exception {
+    	// TODO Auto-generated method stub
+    	
     }
     
     

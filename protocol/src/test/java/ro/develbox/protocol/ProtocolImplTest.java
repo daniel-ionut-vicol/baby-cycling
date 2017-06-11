@@ -3,11 +3,15 @@ package ro.develbox.protocol;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import mockit.Expectations;
+import mockit.MockUp;
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.ServerCommand;
 import ro.develbox.commands.ClientTypeTestCommand;
@@ -23,37 +27,45 @@ import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 import ro.develbox.protocol.server.ServerProtocol;
 
 public class ProtocolImplTest extends ProtocolTest {
-
+	
+	private ICommunicationChannel channel;
+	
+	@BeforeClass
+	public void setup(){
+		super.setup();
+		channel = new MockUp<ICommunicationChannel>(){}.getMockInstance();
+	}
+	
     @Test
     public void testServerProtocolConstructor() {
-        Protocol serverP = new ServerProtocol(responder, sender){};
+        Protocol serverP = new ServerProtocol(responder, channel){};
         Assert.assertTrue(serverP.commandAnnotation == ServerCommand.class);
     }
 
     @Test
     public void testClientProtocolConstructor() {
-        Protocol clientP = new ClientProtocol(responder, sender){};
+        Protocol clientP = new ClientProtocol(responder, channel){};
         Assert.assertTrue(clientP.commandAnnotation == ClientCommand.class);
     }
 
     @Test(expectedExceptions = {
             ProtocolViolatedException.class }, expectedExceptionsMessageRegExp = ".*Command invalid.*")
     public void testClientCommandRejectedOnServer() throws Exception {
-        ServerProtocol serverP = new ServerProtocol(responder, sender){};
-        serverP.commandReceived(new ClientTypeTestCommand());
+        ServerProtocol serverP = new ServerProtocol(responder, channel){};
+        serverP.validateAndRespond(new ClientTypeTestCommand());
     }
 
     @Test(expectedExceptions = {
             ProtocolViolatedException.class }, expectedExceptionsMessageRegExp = ".*Command invalid.*")
     public void testServerCommandRejectedOnClient() throws Exception {
-        ClientProtocol clientP = new ClientProtocol(responder, sender){};
-        clientP.commandReceived(new ServerTypeTestCommand());
+        ClientProtocol clientP = new ClientProtocol(responder, channel){};
+        clientP.validateAndRespond(new ServerTypeTestCommand());
     }
 
     @DataProvider(name = "comandValidationDp")
     public Object[][] comandValidationDp() {
-        return new Object[][] { { new ServerProtocol(responder, sender){}, new ClientTypeTestCommand() },
-                { new ClientProtocol(responder, sender){}, new ServerTypeTestCommand() } };
+        return new Object[][] { { new ServerProtocol(responder, channel){}, new ClientTypeTestCommand() },
+                { new ClientProtocol(responder, channel){}, new ServerTypeTestCommand() } };
     }
 
     @Test(dataProvider = "comandValidationDp")
@@ -75,7 +87,7 @@ public class ProtocolImplTest extends ProtocolTest {
 
     @DataProvider(name = "protocolImpls")
     public Object[][] protocolImpls() {
-        return new Object[][] { { new ServerProtocol(responder, sender){} }, { new ClientProtocol(responder, sender){} } };
+        return new Object[][] { { new ServerProtocol(responder, channel){} }, { new ClientProtocol(responder, channel){} } };
     }
 
     @Test(dataProvider = "protocolImpls", expectedExceptions = {
@@ -83,36 +95,36 @@ public class ProtocolImplTest extends ProtocolTest {
     public void testCommandRejectedWhenNoAuthReceived(NetworkProtocol protocol)
             throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
         Command received = new TestTypeCommand();
-        Command response = protocol.commandReceived(received);
+        Command response = protocol.validateAndRespond(received);
         assertTrue(response == responderCommand);
         assertTrue(protocol.lastCommand == received);
     }
 
     @Test(dataProvider = "protocolImpls")
     public void testCommandResponseSentAfterAutentication(NetworkProtocol protocol)
-            throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
+            throws WarnCommandException, ErrorCommandException, ProtocolViolatedException, IOException {
         new Expectations() {
             {
-                sender.sendCommand((CommandMessage)any);
+                channel.sendCommand((CommandMessage)any);
                 times = 1;
             }
         };
-        protocol.commandReceived(new MockAuth().getMockInstance());
+        protocol.validateAndRespond(new MockAuth().getMockInstance());
     }
 
     @Test(dataProvider = "protocolImpls")
     public void testCommandAcceptedAfterAuthReceived(NetworkProtocol protocol)
-            throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
+            throws WarnCommandException, ErrorCommandException, ProtocolViolatedException, IOException {
 
         new Expectations() {
             {
-                sender.sendCommand(responderCommand);
+                channel.sendCommand(responderCommand);
                 times = 1;
             }
         };
         Command received = new TestTypeCommand();
-        protocol.commandReceived(new MockAuth().getMockInstance());
-        Command response = protocol.commandReceived(received);
+        protocol.validateAndRespond(new MockAuth().getMockInstance());
+        Command response = protocol.validateAndRespond(received);
         assertTrue(response == responderCommand);
         assertTrue(protocol.lastCommand == received);
     }

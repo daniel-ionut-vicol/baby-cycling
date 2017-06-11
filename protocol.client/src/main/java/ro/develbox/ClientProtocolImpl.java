@@ -1,27 +1,35 @@
 package ro.develbox;
 
-import ro.develbox.commands.Command;
+import java.io.IOException;
+
 import ro.develbox.commands.CommandLogin;
-import ro.develbox.protocol.ICommandSender;
-import ro.develbox.protocol.IProtocolResponse;
+import ro.develbox.commands.CommandRegister;
+import ro.develbox.commands.exceptions.ErrorCommandException;
+import ro.develbox.commands.exceptions.WarnCommandException;
+import ro.develbox.protocol.ICommunicationChannel;
 import ro.develbox.protocol.client.ClientProtocol;
-public class ClientProtocolImpl extends ClientProtocol implements IProtocolResponse{
+import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 
-	public ClientProtocolImpl(IProtocolResponse responder, ICommandSender sender) {
-		super(responder, sender);
-		
+public class ClientProtocolImpl extends ClientProtocol {
+
+	public ClientProtocolImpl(ICommunicationChannel commChannel) {
+		super(new ClientResponserImpl(), commChannel);
 	}
 
-	public void login(String email){
-		CommandLogin login = (CommandLogin)commandConstructor.createCommandInstance(CommandLogin.COMMAND);
+	public void login(String email,String password) throws WarnCommandException, ErrorCommandException, ProtocolViolatedException, IOException {
+		CommandLogin login = (CommandLogin) createCommand(CommandLogin.COMMAND);
 		login.setEmail(email);
-		login.setPassword(email);
+		login.setPassword(password);
+		startCommandSequence(login);
 	}
 
-	@Override
-	public Command getCommandResponse(Command command) {
-		// TODO Auto-generated method stub
-		return null;
+	public void register(String email, String nickName, String registrationId)
+			throws WarnCommandException, ErrorCommandException, ProtocolViolatedException, IOException {
+		CommandRegister register = (CommandRegister) createCommand(CommandRegister.COMMAND);
+		register.setEmail(email);
+		register.setNickName(nickName);
+		register.setRegistrationId(registrationId);
+		startCommandSequence(register);
 	}
-	
+
 }

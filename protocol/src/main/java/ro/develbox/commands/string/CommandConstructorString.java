@@ -10,7 +10,7 @@ import ro.develbox.commands.ICommandContructor;
 
 public class CommandConstructorString implements ICommandContructor {
 
-    public static final String PARAMSEP = ",,++--00";
+    public static final String PARAMSEP = "0012300";
     
     @Override
     public Command constructCommand(String strCommand) {

@@ -1,6 +1,9 @@
 package ro.develbox;
 
 import java.io.IOException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -10,62 +13,56 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import ro.develbox.commands.Command;
-import ro.develbox.commands.CommandAuth;
-import ro.develbox.commands.CommandLogin;
-import ro.develbox.commands.CommandMessage.TYPE;
-import ro.develbox.commands.CommandRegister;
-import ro.develbox.commands.ICommandContructor;
-import ro.develbox.commands.exceptions.ErrorCommandException;
-import ro.develbox.commands.exceptions.WarnCommandException;
-import ro.develbox.commands.string.CommandConstructorString;
-import ro.develbox.model.User;
-import ro.develbox.protocol.ICommandSender;
-import ro.develbox.protocol.IProtocolResponse;
-import ro.develbox.protocol.exceptions.ProtocolViolatedException;
+import ro.develbox.protocol.ICommunicationChannel;
 import ro.develbox.protocol.server.ServerProtocol;
 
 @ServerEndpoint(value = "/cyclingWSE")
-public class WebSocketEndPoint implements ICommandSender, IProtocolResponse {
+public class WebSocketEndPoint implements ICommunicationChannel {
 
     private ServerProtocol serverProtocol;
     private Session session;
-    private boolean authed;
-    private User user;
-
-    private ICommandContructor commandConstr = new CommandConstructorString();
+    private BlockingQueue<Command> commands;
     
+    public WebSocketEndPoint(){
+    	commands = new LinkedBlockingQueue<>();
+    }
+
     @OnOpen
     public void onOpen(Session session) {
         System.out.println("Open");
         this.session = session;
-        serverProtocol = new ServerProtocol(this, this){};
-        authed = false;
+        serverProtocol = new ServerProtocolImpl(this);
+        try {
+			serverProtocol.connect();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     @OnClose
     public void onClose(Session session) {
         System.out.println("Close");
         this.session = null;
+        try {
+			serverProtocol.disconnect();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         serverProtocol = null;
-        authed = false;
     }
 
     @OnMessage
     public void onMessage(String message, Session userSession) {
         System.out.println("MessageReceived : " + message);
-        Command command = commandConstr.constructCommand(message);
+        Command command = serverProtocol.getCommandConstructor().constructCommand(message);
         try {
-            serverProtocol.commandReceived(command);
-        } catch (WarnCommandException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ErrorCommandException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ProtocolViolatedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+			commands.offer(command, Long.MAX_VALUE, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     @OnError
@@ -85,40 +82,29 @@ public class WebSocketEndPoint implements ICommandSender, IProtocolResponse {
         }
     }
 
-    @Override
-    public Command getCommandResponse(Command command) {
-        Command ret = null;
-        if (!authed) {
-            System.out.println("NOT AUTHAED");
-            if (!(command instanceof CommandAuth)) {
-                ret = commandConstr.contructMessageCommand(TYPE.ERROR, "NOT AUTHED");
-                System.out.println("INCORECTR TYPE");
-            } else {
-                // TODO AUTH
-                authed = true;
-            }
-        } else {
-            if (command instanceof CommandRegister) {
-                // TODO register user
-                User user = new User();
-                CommandRegister registerCm = (CommandRegister)command;
-                user.setEmail(registerCm.getEmail());
-                user.setName(registerCm.getNickName());
-                user.setRegid(registerCm.getRegistrationId());
-                // TODO persist user
-                this.user = user;
-                ret = commandConstr.contructMessageCommand(TYPE.OK, "USER REGISTERED");
-            } else if (command instanceof CommandLogin) {
-                // TODO login user
-                // TODO check user
-                CommandLogin loginCm = (CommandLogin)command;
-                User user = new User();
-                user.setEmail(loginCm.getEmail());
-                ret = commandConstr.contructMessageCommand(TYPE.OK, "USER LOGGED IN");
-            }
-        }
+	@Override
+	public void connect() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 
-        return ret;
-    }
+	@Override
+	public void disconnect() throws Exception {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public Command receiveCommand() {
+		Command received = null;
+		while(session!=null && received==null){
+			try {
+				received = commands.poll(100, TimeUnit.MILLISECONDS);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return received;
+	}
 
 }

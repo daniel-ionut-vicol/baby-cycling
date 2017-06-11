@@ -34,6 +34,7 @@ public abstract class Protocol{
         this.responder = responder;
         this.commandConstructor = commandConstructor;
         this.commandAnnotation = commandAnnotation;
+        responder.setCommandConstr(commandConstructor);
     }
 
     public Command getLastCommand() {
@@ -50,7 +51,7 @@ public abstract class Protocol{
      * @throws WarnCommandException
      * @throws ErrorCommandException
      */
-    public Command commandReceived(Command receivedCommand)
+    public Command validateAndRespond(Command receivedCommand)
             throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
         Command respCommand = null;
         if (receivedCommand == null) {
@@ -190,5 +191,9 @@ public abstract class Protocol{
         Object ann = object.getClass().getAnnotation(annotationClass);
         return ann;
     }
+
+	public ICommandContructor getCommandConstructor() {
+		return commandConstructor;
+	}
 
 }

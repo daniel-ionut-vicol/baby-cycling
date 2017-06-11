@@ -37,5 +37,12 @@ public class ProtocolResponseAuthWrapper implements IProtocolResponse{
         //do some logic here
         return true;
     }
+
+	@Override
+	public void setCommandConstr(ICommandContructor commandConstr) {
+		commandConstrutor = commandConstr;
+	}
+    
+    
     
 }

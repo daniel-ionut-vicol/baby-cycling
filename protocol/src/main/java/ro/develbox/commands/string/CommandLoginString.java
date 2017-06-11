@@ -16,4 +16,8 @@ public class CommandLoginString extends CommandLogin {
         return COMMAND + getEmail()+CommandConstructorString.PARAMSEP+getPassword();
     }
 
+    
+    public static void main(String[] args) {
+		new CommandLoginString().fromNetwork("email,,++--00pass");
+	}
 }

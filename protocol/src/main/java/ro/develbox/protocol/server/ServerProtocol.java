@@ -1,10 +1,12 @@
 package ro.develbox.protocol.server;
 
+import java.io.IOException;
+
 import ro.develbox.annotation.ServerCommand;
 import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandAuth;
 import ro.develbox.commands.CommandConstructorInstance;
-import ro.develbox.protocol.ICommandSender;
+import ro.develbox.protocol.ICommunicationChannel;
 import ro.develbox.protocol.IProtocolResponse;
 import ro.develbox.protocol.NetworkProtocol;
 import ro.develbox.protocol.ProtocolResponseAuthWrapper;
@@ -14,8 +16,8 @@ import ro.develbox.protocol.exceptions.ServerProtocolViolatedException;
 @SuppressWarnings("rawtypes")
 public abstract class ServerProtocol extends NetworkProtocol{
 
-    public ServerProtocol(IProtocolResponse responder, ICommandSender sender) {
-        super(new ProtocolResponseAuthWrapper(responder, CommandConstructorInstance.commandConstructor), sender,
+    public ServerProtocol(IProtocolResponse responder, ICommunicationChannel commChannel) {
+        super(new ProtocolResponseAuthWrapper(responder, CommandConstructorInstance.commandConstructor), commChannel,
                 CommandConstructorInstance.commandConstructor, ServerCommand.class);
     }
 
@@ -38,21 +40,9 @@ public abstract class ServerProtocol extends NetworkProtocol{
     }
 
     @Override
-    public void errorReceived(Throwable e) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    final protected void afterConnected() {
+    final protected void afterConnected() throws IOException {
         CommandAuth auth = (CommandAuth)commandConstructor.createCommandInstance(CommandAuth.COMMAND);
         //TODO set auth key
-        sender.sendCommand(auth);
+        commChannel.sendCommand(auth);
     }
-
-    @Override
-    public void disconnected(String reason) {
-        // TODO Auto-generated method stub
-
-    }
-
 }
