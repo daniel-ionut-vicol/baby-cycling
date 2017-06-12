@@ -1,3 +1,5 @@
 dependencies {
     compile project (':protocol')
+    // https://mvnrepository.com/artifact/com.squareup/javapoet
+    compile group: 'com.squareup', name: 'javapoet', version: '1.8.0'
 }

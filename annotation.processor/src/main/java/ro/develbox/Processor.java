@@ -1,8 +1,7 @@
 package ro.develbox;
 
-import java.util.LinkedHashMap;
+import java.io.IOException;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -24,6 +23,7 @@ import javax.tools.Diagnostic.Kind;
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.ServerCommand;
 
+@SupportedAnnotationTypes(value= {"*"})
 public class Processor extends AbstractProcessor {
 
 	private Types typeUtils;
@@ -34,19 +34,22 @@ public class Processor extends AbstractProcessor {
 
 	@Override
 	public synchronized void init(ProcessingEnvironment env) {
-		super.init(processingEnv);
-		typeUtils = processingEnv.getTypeUtils();
-		elementUtils = processingEnv.getElementUtils();
-		filer = processingEnv.getFiler();
-		messager = processingEnv.getMessager();
+		super.init(env);
+		typeUtils = env.getTypeUtils();
+		elementUtils = env.getElementUtils();
+		filer = env.getFiler();
+		messager = env.getMessager();
 		serverClasses = new ServerCommandClasses();
 	}
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annoations, RoundEnvironment env) {
-		// Itearate over all @ServerCommand annotated elements
+		serverClasses.clear();
+		boolean found  = false;
+	    // Itearate over all @ServerCommand annotated elements
 		for (Element annotatedElement : env.getElementsAnnotatedWith(ServerCommand.class)) {
-			// Check if a class has been annotated with @ServerCommand
+			found  = true;
+		    // Check if a class has been annotated with @ServerCommand
 			if (annotatedElement.getKind() != ElementKind.CLASS) {
 				error(annotatedElement, "Only classes can be annotated with @%s", ServerCommand.class.getSimpleName());
 				return true; // Exit processing
@@ -58,7 +61,15 @@ public class Processor extends AbstractProcessor {
 			if (!isValidClass(typeElement)) {
 				return true; // Error message printed, exit processing
 			}
-			serverClasses.generateClientCode(elementUtils, filer);
+		}
+		try {
+            serverClasses.generateClientCode(elementUtils, filer);
+        } catch (IOException e) {
+            error(null, "IO Exception");
+        }
+		if(!found){
+		    error(null, "NO ANNOTATIONS");
+		    return true;
 		}
 		return false;
 	}
@@ -85,8 +96,8 @@ public class Processor extends AbstractProcessor {
 	    }
 
 	    // Check if it's an abstract class
-	    if (classElement.getModifiers().contains(Modifier.ABSTRACT)) {
-	      error(classElement, "The class %s is abstract. You can't annotate abstract classes with @%",
+	    if (!classElement.getModifiers().contains(Modifier.ABSTRACT)) {
+	      error(classElement, "The class %s is not abstract. You can't annotate non abstract classes with @%",
 	          classElement.getQualifiedName().toString(), ServerCommand.class.getSimpleName());
 	      return false;
 	    }
@@ -110,6 +121,10 @@ public class Processor extends AbstractProcessor {
 	  }
 	
 	private void error(Element e, String msg, Object... args) {
-		messager.printMessage(Kind.ERROR, String.format(msg, args), e);
+	    if(e!=null){
+	        messager.printMessage(Kind.ERROR, String.format(msg, args), e);
+	    }else{
+	        messager.printMessage(Kind.ERROR, String.format(msg, args));
+	    }
 	}
 }
