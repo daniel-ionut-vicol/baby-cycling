@@ -3,3 +3,13 @@ dependencies {
 
 	compile 'org.eclipse.jetty.websocket:javax-websocket-client-impl:9.1.0.M0'
 }
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': 'Client all dependencies'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
