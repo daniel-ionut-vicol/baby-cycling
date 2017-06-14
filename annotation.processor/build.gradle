@@ -1,5 +1,15 @@
 dependencies {
-    compile project (':protocol')
+    compile project (':protocol.core')
     // https://mvnrepository.com/artifact/com.squareup/javapoet
     compile group: 'com.squareup', name: 'javapoet', version: '1.8.0'
+}
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': 'Annotation Processor'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }

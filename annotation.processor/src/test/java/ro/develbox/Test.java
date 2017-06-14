@@ -1,9 +1,12 @@
-package develbox;
+package ro.develbox;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.tools.JavaCompiler;
@@ -20,13 +23,29 @@ public class Test {
 
     @org.testng.annotations.Test
     public void runAnnoationProcessor() throws Exception {
-       String source = "d:/work/aplicatii develbox/baby-cycling/protocol.core/src/main/java";
+       String source = "d:/baby-cycling/protocol/src/main/java";
+       String compiled = "d:/baby-cycling/protocol/build/classes/main";
 
        Iterable<JavaFileObject> files = getSourceFiles(source);
+       Iterable<JavaFileObject> compiledFiles = getSourceFiles(compiled);
 
+       List<JavaFileObject> allfiles = new ArrayList<>();
+       Iterator<JavaFileObject> i = files.iterator();
+       while(i.hasNext()){
+    	   allfiles.add(i.next());
+       }
+        i = compiledFiles.iterator();
+       while(i.hasNext()){
+    	   allfiles.add(i.next());
+       }
+       
        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
-       CompilationTask task = compiler.getTask(new PrintWriter(System.out), null, null, null, null, files);
+       List<String> optionList = new ArrayList<String>();
+       optionList.add("-classpath");
+       optionList.add(System.getProperty("java.class.path"));
+       
+       CompilationTask task = compiler.getTask(new PrintWriter(System.out), null, null, optionList, null, allfiles);
        task.setProcessors(Arrays.asList(new Processor()));
 
        task.call();
@@ -37,8 +56,17 @@ public class Test {
       StandardJavaFileManager files = compiler.getStandardFileManager(null, null, null);
 
       files.setLocation(StandardLocation.SOURCE_PATH, Arrays.asList(new File(p_path)));
-
       Set<Kind> fileKinds = Collections.singleton(Kind.SOURCE);
+      
       return files.list(StandardLocation.SOURCE_PATH, "", fileKinds, true);
     }
+    
+    private Iterable<JavaFileObject> getCompileFiles(String p_path) throws Exception {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        StandardJavaFileManager files = compiler.getStandardFileManager(null, null, null);
+
+        files.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(new File(p_path)));
+        Set<Kind> fileKinds = Collections.singleton(Kind.CLASS);
+        return files.list(StandardLocation.CLASS_OUTPUT, "", fileKinds, true);
+      }
 }

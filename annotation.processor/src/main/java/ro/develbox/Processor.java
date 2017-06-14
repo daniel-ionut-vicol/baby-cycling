@@ -23,7 +23,6 @@ import javax.tools.Diagnostic.Kind;
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.ServerCommand;
 
-@SupportedAnnotationTypes(value= {"*"})
 public class Processor extends AbstractProcessor {
 
 	private Types typeUtils;
@@ -45,8 +44,8 @@ public class Processor extends AbstractProcessor {
 	@Override
 	public boolean process(Set<? extends TypeElement> annoations, RoundEnvironment env) {
 		serverClasses.clear();
-		boolean found  = false;
-	    // Itearate over all @ServerCommand annotated elements
+	    boolean found = false;
+		// Itearate over all @ServerCommand annotated elements
 		for (Element annotatedElement : env.getElementsAnnotatedWith(ServerCommand.class)) {
 			found  = true;
 		    // Check if a class has been annotated with @ServerCommand
@@ -62,14 +61,12 @@ public class Processor extends AbstractProcessor {
 				return true; // Error message printed, exit processing
 			}
 		}
-		try {
-            serverClasses.generateClientCode(elementUtils, filer);
-        } catch (IOException e) {
-            error(null, "IO Exception");
-        }
-		if(!found){
-		    error(null, "NO ANNOTATIONS");
-		    return true;
+		if(found){
+			try {
+		        serverClasses.generateClientCode(elementUtils, filer);
+		    } catch (IOException e) {
+		        error(null, "IO Exception");
+		    }
 		}
 		return false;
 	}

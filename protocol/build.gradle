@@ -1,7 +1,28 @@
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "net.ltgt.gradle:gradle-apt-plugin:0.10"
+  }
+}
+
+apply plugin: "net.ltgt.apt"
+
 dependencies {
 	
     compile project (':protocol.core')
 	
 	testCompile project(':protocol.core').sourceSets.test.output
 
+	apt files('../annotation.processor/build/libs/annotation.processor-all.jar')
+}
+
+tasks.withType(JavaCompile) {
+	// we need to make sure that annotation processor jar was created
+	 dependsOn ':annotation.processor:fatJar'
+	 
+	 options.fork = true
 }

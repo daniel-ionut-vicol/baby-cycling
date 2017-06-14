@@ -14,6 +14,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.tools.JavaFileObject;
 
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
@@ -22,7 +23,6 @@ import com.squareup.javapoet.TypeSpec;
 
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
-import ro.develbox.protocol.ICommunicationChannel;
 import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 
 public class ServerCommandClasses {
@@ -43,25 +43,25 @@ public class ServerCommandClasses {
     public void generateClientCode(Elements elementUtils, Filer filer) throws IOException {
 
         List<MethodSpec> methods = new ArrayList<>();
+        
+        TypeName clientProtocolType = getTypeName(elementUtils, "ro.develbox.protocol.client.ClientProtocol");
+        
+        //class fields
+        TypeSpec.Builder clientProtocol = TypeSpec.classBuilder("ClientProtocolApiWrapper").addModifiers(Modifier.PUBLIC).addField(clientProtocolType, "client");
+        
+        //class constructors
         MethodSpec constructor = MethodSpec.constructorBuilder()
-                .addParameter(ICommunicationChannel.class, "commChannel")
-                .addStatement("super(new ClientResponserImpl(), commChannel)").build();
+                .addParameter(clientProtocolType, "client")
+                .addStatement("this.client=client").build();
         methods.add(constructor);
 
+        //class methods
         for (TypeElement element : elements) {
-            // public void login(String email,String password) throws
-            // WarnCommandException, ErrorCommandException,
-            // ProtocolViolatedException, IOException {
-            // CommandLogin login = (CommandLogin)
-            // createCommand(CommandLogin.COMMAND);
-            // login.setEmail(email);
-            // login.setPassword(password);
-            // startCommandSequence(login);
-            // }
             String name = element.getSimpleName().toString();
 
             List<ParameterSpec> parameters = new ArrayList<>();
             
+            //method parameters
             List<? extends Element> enclosing = element.getEnclosedElements();
             for (Element enclosed : enclosing){
                 if(enclosed.getKind() == ElementKind.FIELD && !enclosed.getModifiers().contains(Modifier.STATIC)){
@@ -72,27 +72,38 @@ public class ServerCommandClasses {
                     parameters.add(param);
                 }
             }
-            
-            // get all fields of the class
-
             com.squareup.javapoet.MethodSpec.Builder builder = MethodSpec.methodBuilder(name);
 
             builder.addModifiers(Modifier.PUBLIC).returns(void.class).addParameters(parameters)
                     .addException(WarnCommandException.class).addException(ErrorCommandException.class)
                     .addException(ProtocolViolatedException.class).addException(IOException.class).build();
 
+            //method body 
+            
+//            CommandLogin login = (CommandLogin) client.createCommand(CommandLogin.COMMAND);
+//    		login.setEmail(email);
+//    		login.setPassword(password);
+//    		client.startCommandSequence(login);
+            ClassName className = ClassName.get(element);
+            builder.addStatement("$T comm = ($T) client.createCommand($T.COMMAND);", className,className,className);
+            builder.addStatement("client.startCommandSequence(comm)");
             MethodSpec method = builder.build();
             methods.add(method);
         }
 
-        TypeSpec clientProtocol = TypeSpec.classBuilder("ClientProtocolImpl22").addModifiers(Modifier.PUBLIC)
-                .addMethods(methods).build();
+        clientProtocol.addMethods(methods);
 
-        JavaFile javaFile = JavaFile.builder("ro.develbox", clientProtocol).build();
-        JavaFileObject jfo = filer.createSourceFile("ClientProtocolImpl22");
+        JavaFile javaFile = JavaFile.builder("ro.develbox", clientProtocol.build()).build();
+        JavaFileObject jfo = filer.createSourceFile("ro.develbox.ClientProtocolApiWrapper");
         Writer writer = jfo.openWriter();
         javaFile.writeTo(writer);
         writer.flush();
         writer.close();
+    }
+    
+    private TypeName getTypeName(Elements elementUtils,String canonicalClassName){
+    	TypeElement commChannel = elementUtils.getTypeElement("ro.develbox.protocol.client.ClientProtocol");
+        TypeName type = TypeName.get(commChannel.asType());
+        return type;
     }
 }

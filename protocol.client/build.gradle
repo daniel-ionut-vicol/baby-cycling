@@ -1,5 +1,3 @@
 dependencies {
-
     compile project (':protocol')
-    compile project (':annotation.processor')
 }
