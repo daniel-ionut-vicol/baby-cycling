@@ -1,8 +1,9 @@
 package ro.develbox;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -10,7 +11,6 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -24,12 +24,12 @@ import javax.tools.Diagnostic.Kind;
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.ServerCommand;
 
-public class Processor extends AbstractProcessor {
+public abstract class CommandsProcessor extends AbstractProcessor {
 
-	private Types typeUtils;
-	private Elements elementUtils;
-	private Filer filer;
-	private Messager messager;
+	protected Types typeUtils;
+	protected Elements elementUtils;
+	protected Filer filer;
+	protected Messager messager;
 
 	@Override
 	public synchronized void init(ProcessingEnvironment env) {
@@ -38,46 +38,6 @@ public class Processor extends AbstractProcessor {
 		elementUtils = env.getElementUtils();
 		filer = env.getFiler();
 		messager = env.getMessager();
-	}
-
-	@Override
-	public boolean process(Set<? extends TypeElement> annoations, RoundEnvironment env) {
-		generateApiFile(env, ServerCommand.class, "ro.develbox.protocol.client", "ClientProtocolApiWrapper",
-				"ro.develbox.protocol.client.ClientProtocol");
-		generateApiFile(env, ClientCommand.class, "ro.develbox.protocol.server", "ServerProtocolApiWrapper",
-				"ro.develbox.protocol.client.ServerProtocol");
-		return false;
-	}
-
-	public boolean generateApiFile(RoundEnvironment env, Class<? extends Annotation> annotationClass,
-			String packageName, String generatedClass, String wrappedClass) {
-		ProtocolApiGenerator serverClasses = new ProtocolApiGenerator();
-		boolean found = false;
-		// Itearate over all @ServerCommand annotated elements
-		for (Element annotatedElement : env.getElementsAnnotatedWith(annotationClass)) {
-			found = true;
-			// Check if a class has been annotated with @ServerCommand
-			if (annotatedElement.getKind() != ElementKind.CLASS) {
-				error(annotatedElement, "Only classes can be annotated with @%s", ServerCommand.class.getSimpleName());
-				return true; // Exit processing
-			}
-
-			// We can cast it, because we know that it of ElementKind.CLASS
-			TypeElement typeElement = (TypeElement) annotatedElement;
-			serverClasses.addClass(typeElement);
-			if (!isValidClass(typeElement)) {
-				return true; // Error message printed, exit processing
-			}
-		}
-		if (found) {
-			try {
-				serverClasses.generateCode(elementUtils, filer, packageName, generatedClass, wrappedClass);
-			} catch (Exception e) {
-				e.printStackTrace(System.out);
-				error(null, "Exception : " + e.getMessage());
-			}
-		}
-		return false;
 	}
 
 	@Override
@@ -93,7 +53,27 @@ public class Processor extends AbstractProcessor {
 		return SourceVersion.latestSupported();
 	}
 
-	private boolean isValidClass(TypeElement classElement) {
+	protected List<TypeElement> getCommandElements(RoundEnvironment env, Class<? extends Annotation> annotationClass) throws Exception{
+		List<TypeElement> elements = new ArrayList<>();
+		// Itearate over all @ServerCommand annotated elements
+		for (Element annotatedElement : env.getElementsAnnotatedWith(annotationClass)) {
+			// Check if a class has been annotated with @ServerCommand
+			if (annotatedElement.getKind() != ElementKind.CLASS) {
+				error(annotatedElement, "Only classes can be annotated with @%s", ServerCommand.class.getSimpleName());
+				throw new Exception(); // Exit processing
+			}
+
+			// We can cast it, because we know that it of ElementKind.CLASS
+			TypeElement typeElement = (TypeElement) annotatedElement;
+			if (!isValidClass(typeElement)) {
+				throw new Exception(); // Error message printed, exit processing
+			}
+			elements.add(typeElement);
+		}
+		return elements;
+	}
+
+	protected boolean isValidClass(TypeElement classElement) {
 
 		if (!classElement.getModifiers().contains(Modifier.PUBLIC)) {
 			error(classElement, "The class %s is not public.", classElement.getQualifiedName().toString());
@@ -107,6 +87,15 @@ public class Processor extends AbstractProcessor {
 			return false;
 		}
 
+		Element commandClass = elementUtils.getTypeElement("ro.develbox.commands.Command");
+
+		// check if it extends Command
+		if (!classElement.getSuperclass().equals(commandClass.asType())) {
+			error(classElement, "The class %s does not extends ro.develbox.commands.Command",
+					classElement.getQualifiedName().toString());
+			return false;
+		}
+		classElement.getSuperclass();
 		// Check if an empty public constructor is given
 		for (Element enclosed : classElement.getEnclosedElements()) {
 			if (enclosed.getKind() == ElementKind.CONSTRUCTOR) {
@@ -125,7 +114,7 @@ public class Processor extends AbstractProcessor {
 		return false;
 	}
 
-	private void error(Element e, String msg, Object... args) {
+	protected void error(Element e, String msg, Object... args) {
 		if (e != null) {
 			messager.printMessage(Kind.ERROR, String.format(msg, args), e);
 		} else {

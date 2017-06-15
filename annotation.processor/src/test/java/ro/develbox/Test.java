@@ -17,7 +17,7 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
-import ro.develbox.Processor;
+import ro.develbox.GenerateProtocolApiProcessor;
 
 public class Test {
 
@@ -46,7 +46,7 @@ public class Test {
        optionList.add(System.getProperty("java.class.path"));
        
        CompilationTask task = compiler.getTask(new PrintWriter(System.out), null, null, optionList, null, allfiles);
-       task.setProcessors(Arrays.asList(new Processor()));
+       task.setProcessors(Arrays.asList(new GenerateProtocolApiProcessor()));
 
        task.call();
     }

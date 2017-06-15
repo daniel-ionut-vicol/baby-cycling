@@ -35,6 +35,10 @@ public class ProtocolApiGenerator {
 	public void addClass(TypeElement element) {
 		elements.add(element);
 	}
+	
+	public void addClasses(List<TypeElement> elements){
+		this.elements.addAll(elements);
+	}
 
 	public void clear() {
 		elements.clear();
