@@ -90,12 +90,12 @@ public class ServerCommandClasses {
                     .addException(WarnCommandException.class).addException(ErrorCommandException.class)
                     .addException(ProtocolViolatedException.class).addException(IOException.class).build();
 
-//            try{
-//                checkSetters(fieldsName,elementMethods);
-//            }catch(Exception e){
-//                //add class name to exception message
-//                throw new Exception(e.getMessage()+" class " + element.getSimpleName());
-//            }
+            try{
+                checkSetters(fieldsName,elementMethods);
+            }catch(Exception e){
+                //add class name to exception message
+                throw new Exception(e.getMessage()+" class " + element.getSimpleName());
+            }
             
             ClassName className = ClassName.get(element);
             String varName = "comm";
@@ -125,9 +125,9 @@ public class ServerCommandClasses {
     }
     
     private void checkSetter(String field, List<Element> methods)throws Exception{
-        String expectedName = getSetterForField(field);
+    	String expectedName = getSetterForField(field);
         for(Element method : methods){
-            if(method.getSimpleName().equals(expectedName)){
+            if(method.getSimpleName().toString().equals(expectedName)){
                 return;
             }
         }
