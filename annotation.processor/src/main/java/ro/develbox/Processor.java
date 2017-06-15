@@ -64,8 +64,9 @@ public class Processor extends AbstractProcessor {
 		if(found){
 			try {
 		        serverClasses.generateClientCode(elementUtils, filer);
-		    } catch (IOException e) {
-		        error(null, "IO Exception");
+		    } catch (Exception e) {
+		        e.printStackTrace(System.out);
+		        error(null, "Exception : " + e.getMessage());
 		    }
 		}
 		return false;

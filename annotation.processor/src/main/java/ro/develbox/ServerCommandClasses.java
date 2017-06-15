@@ -40,7 +40,7 @@ public class ServerCommandClasses {
         elements.clear();
     }
 
-    public void generateClientCode(Elements elementUtils, Filer filer) throws IOException {
+    public void generateClientCode(Elements elementUtils, Filer filer) throws Exception {
 
         List<MethodSpec> methods = new ArrayList<>();
         
@@ -60,6 +60,13 @@ public class ServerCommandClasses {
             String name = element.getSimpleName().toString();
 
             List<ParameterSpec> parameters = new ArrayList<>();
+
+            //collection of all fields names 
+            List<String> fieldsName = new ArrayList<>();
+
+            //collection of all public methods of this element
+            //used to make sure that each fields has setter defined
+            List<Element> elementMethods = new ArrayList<>();
             
             //method parameters
             List<? extends Element> enclosing = element.getEnclosedElements();
@@ -68,8 +75,13 @@ public class ServerCommandClasses {
                     TypeMirror type = enclosed.asType();
                     TypeName tn = TypeName.get(type);
                     String paramName = enclosed.toString();
+                    fieldsName.add(paramName);
                     ParameterSpec param = ParameterSpec.builder(tn, paramName).build();
                     parameters.add(param);
+                } else if (enclosed.getKind() == ElementKind.METHOD
+                        && !enclosed.getModifiers().contains(Modifier.STATIC)
+                        && !enclosed.getModifiers().contains(Modifier.PRIVATE)) {
+                    elementMethods.add(enclosed);
                 }
             }
             com.squareup.javapoet.MethodSpec.Builder builder = MethodSpec.methodBuilder(name);
@@ -78,14 +90,19 @@ public class ServerCommandClasses {
                     .addException(WarnCommandException.class).addException(ErrorCommandException.class)
                     .addException(ProtocolViolatedException.class).addException(IOException.class).build();
 
-            //method body 
+//            try{
+//                checkSetters(fieldsName,elementMethods);
+//            }catch(Exception e){
+//                //add class name to exception message
+//                throw new Exception(e.getMessage()+" class " + element.getSimpleName());
+//            }
             
-//            CommandLogin login = (CommandLogin) client.createCommand(CommandLogin.COMMAND);
-//    		login.setEmail(email);
-//    		login.setPassword(password);
-//    		client.startCommandSequence(login);
             ClassName className = ClassName.get(element);
-            builder.addStatement("$T comm = ($T) client.createCommand($T.COMMAND);", className,className,className);
+            String varName = "comm";
+            builder.addStatement("$T "+varName+" = ($T) client.createCommand($T.COMMAND);", className,className,className);
+            for(String field : fieldsName ){
+                builder.addStatement(varName+"."+getSetterForField(field)+"("+field+")");
+            }
             builder.addStatement("client.startCommandSequence(comm)");
             MethodSpec method = builder.build();
             methods.add(method);
@@ -99,6 +116,28 @@ public class ServerCommandClasses {
         javaFile.writeTo(writer);
         writer.flush();
         writer.close();
+    }
+    
+    private void checkSetters(List<String> fields, List<Element> methods) throws Exception{
+        for (String field: fields){
+            checkSetter(field,methods);
+        }
+    }
+    
+    private void checkSetter(String field, List<Element> methods)throws Exception{
+        String expectedName = getSetterForField(field);
+        for(Element method : methods){
+            if(method.getSimpleName().equals(expectedName)){
+                return;
+            }
+        }
+        throw new Exception("Could not find setter("+expectedName+") for field : " + field );
+    }
+    
+    private String getSetterForField(String field){
+        String firstLetter = field.substring(0,1);
+        String rest = field.substring(1);
+        return "set"+firstLetter.toUpperCase()+rest;
     }
     
     private TypeName getTypeName(Elements elementUtils,String canonicalClassName){
