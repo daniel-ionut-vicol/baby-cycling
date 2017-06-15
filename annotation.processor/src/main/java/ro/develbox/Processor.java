@@ -1,6 +1,7 @@
 package ro.develbox;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -29,7 +30,6 @@ public class Processor extends AbstractProcessor {
 	private Elements elementUtils;
 	private Filer filer;
 	private Messager messager;
-	private ServerCommandClasses serverClasses;
 
 	@Override
 	public synchronized void init(ProcessingEnvironment env) {
@@ -38,17 +38,25 @@ public class Processor extends AbstractProcessor {
 		elementUtils = env.getElementUtils();
 		filer = env.getFiler();
 		messager = env.getMessager();
-		serverClasses = new ServerCommandClasses();
 	}
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annoations, RoundEnvironment env) {
-		serverClasses.clear();
-	    boolean found = false;
+		generateApiFile(env, ServerCommand.class, "ro.develbox.protocol.client", "ClientProtocolApiWrapper",
+				"ro.develbox.protocol.client.ClientProtocol");
+		generateApiFile(env, ClientCommand.class, "ro.develbox.protocol.server", "ServerProtocolApiWrapper",
+				"ro.develbox.protocol.client.ServerProtocol");
+		return false;
+	}
+
+	public boolean generateApiFile(RoundEnvironment env, Class<? extends Annotation> annotationClass,
+			String packageName, String generatedClass, String wrappedClass) {
+		ProtocolApiGenerator serverClasses = new ProtocolApiGenerator();
+		boolean found = false;
 		// Itearate over all @ServerCommand annotated elements
-		for (Element annotatedElement : env.getElementsAnnotatedWith(ServerCommand.class)) {
-			found  = true;
-		    // Check if a class has been annotated with @ServerCommand
+		for (Element annotatedElement : env.getElementsAnnotatedWith(annotationClass)) {
+			found = true;
+			// Check if a class has been annotated with @ServerCommand
 			if (annotatedElement.getKind() != ElementKind.CLASS) {
 				error(annotatedElement, "Only classes can be annotated with @%s", ServerCommand.class.getSimpleName());
 				return true; // Exit processing
@@ -61,13 +69,13 @@ public class Processor extends AbstractProcessor {
 				return true; // Error message printed, exit processing
 			}
 		}
-		if(found){
+		if (found) {
 			try {
-		        serverClasses.generateClientCode(elementUtils, filer);
-		    } catch (Exception e) {
-		        e.printStackTrace(System.out);
-		        error(null, "Exception : " + e.getMessage());
-		    }
+				serverClasses.generateCode(elementUtils, filer, packageName, generatedClass, wrappedClass);
+			} catch (Exception e) {
+				e.printStackTrace(System.out);
+				error(null, "Exception : " + e.getMessage());
+			}
 		}
 		return false;
 	}
@@ -87,42 +95,41 @@ public class Processor extends AbstractProcessor {
 
 	private boolean isValidClass(TypeElement classElement) {
 
-	    if (!classElement.getModifiers().contains(Modifier.PUBLIC)) {
-	      error(classElement, "The class %s is not public.",
-	          classElement.getQualifiedName().toString());
-	      return false;
-	    }
+		if (!classElement.getModifiers().contains(Modifier.PUBLIC)) {
+			error(classElement, "The class %s is not public.", classElement.getQualifiedName().toString());
+			return false;
+		}
 
-	    // Check if it's an abstract class
-	    if (!classElement.getModifiers().contains(Modifier.ABSTRACT)) {
-	      error(classElement, "The class %s is not abstract. You can't annotate non abstract classes with @%",
-	          classElement.getQualifiedName().toString(), ServerCommand.class.getSimpleName());
-	      return false;
-	    }
+		// Check if it's an abstract class
+		if (!classElement.getModifiers().contains(Modifier.ABSTRACT)) {
+			error(classElement, "The class %s is not abstract. You can't annotate non abstract classes with @%",
+					classElement.getQualifiedName().toString(), ServerCommand.class.getSimpleName());
+			return false;
+		}
 
-	    // Check if an empty public constructor is given
-	    for (Element enclosed : classElement.getEnclosedElements()) {
-	      if (enclosed.getKind() == ElementKind.CONSTRUCTOR) {
-	        ExecutableElement constructorElement = (ExecutableElement) enclosed;
-	        if (constructorElement.getParameters().size() == 0 && constructorElement.getModifiers()
-	            .contains(Modifier.PUBLIC)) {
-	          // Found an empty constructor
-	          return true;
-	        }
-	      }
-	    }
+		// Check if an empty public constructor is given
+		for (Element enclosed : classElement.getEnclosedElements()) {
+			if (enclosed.getKind() == ElementKind.CONSTRUCTOR) {
+				ExecutableElement constructorElement = (ExecutableElement) enclosed;
+				if (constructorElement.getParameters().size() == 0
+						&& constructorElement.getModifiers().contains(Modifier.PUBLIC)) {
+					// Found an empty constructor
+					return true;
+				}
+			}
+		}
 
-	    // No empty constructor found
-	    error(classElement, "The class %s must provide an public empty default constructor",
-	        classElement.getQualifiedName().toString());
-	    return false;
-	  }
-	
+		// No empty constructor found
+		error(classElement, "The class %s must provide an public empty default constructor",
+				classElement.getQualifiedName().toString());
+		return false;
+	}
+
 	private void error(Element e, String msg, Object... args) {
-	    if(e!=null){
-	        messager.printMessage(Kind.ERROR, String.format(msg, args), e);
-	    }else{
-	        messager.printMessage(Kind.ERROR, String.format(msg, args));
-	    }
+		if (e != null) {
+			messager.printMessage(Kind.ERROR, String.format(msg, args), e);
+		} else {
+			messager.printMessage(Kind.ERROR, String.format(msg, args));
+		}
 	}
 }
