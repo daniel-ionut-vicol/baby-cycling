@@ -8,9 +8,12 @@ import java.util.List;
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.tools.JavaFileObject;
 
@@ -66,13 +69,6 @@ public class ProtocolApiGenerator {
 
 			List<ParameterSpec> parameters = new ArrayList<>();
 
-			// collection of all fields names
-			List<String> fieldsName = new ArrayList<>();
-
-			// collection of all public methods of this element
-			// used to make sure that each fields has setter defined
-			List<Element> elementMethods = new ArrayList<>();
-
 			// method parameters
 			List<? extends Element> enclosing = element.getEnclosedElements();
 			for (Element enclosed : enclosing) {
@@ -80,13 +76,8 @@ public class ProtocolApiGenerator {
 					TypeMirror type = enclosed.asType();
 					TypeName tn = TypeName.get(type);
 					String paramName = enclosed.toString();
-					fieldsName.add(paramName);
 					ParameterSpec param = ParameterSpec.builder(tn, paramName).build();
 					parameters.add(param);
-				} else if (enclosed.getKind() == ElementKind.METHOD
-						&& !enclosed.getModifiers().contains(Modifier.STATIC)
-						&& !enclosed.getModifiers().contains(Modifier.PRIVATE)) {
-					elementMethods.add(enclosed);
 				}
 			}
 			com.squareup.javapoet.MethodSpec.Builder builder = MethodSpec.methodBuilder(name);
@@ -95,8 +86,10 @@ public class ProtocolApiGenerator {
 					.addException(WarnCommandException.class).addException(ErrorCommandException.class)
 					.addException(ProtocolViolatedException.class).addException(IOException.class).build();
 
+			List<VariableElement> fields = Utils.filterStaticFields(ElementFilter.fieldsIn(element.getEnclosedElements()));
+			List<ExecutableElement> elementMethods = ElementFilter.methodsIn(element.getEnclosedElements());
 			try {
-				Utils.checkSetters(fieldsName, elementMethods);
+				Utils.checkSetters(fields, elementMethods);
 			} catch (Exception e) {
 				// add class name to exception message
 				throw new Exception(e.getMessage() + " class " + element.getSimpleName());
@@ -106,8 +99,8 @@ public class ProtocolApiGenerator {
 			String varName = "comm";
 			builder.addStatement("$T " + varName + " = ($T) client.createCommand($T.COMMAND);", className, className,
 					className);
-			for (String field : fieldsName) {
-				builder.addStatement(varName + "." + Utils.getSetterForField(field) + "(" + field + ")");
+			for (VariableElement field : fields) {
+				builder.addStatement(varName + "." + Utils.getSetterForField(field.getSimpleName().toString()) + "(" + field + ")");
 			}
 			builder.addStatement("client.startCommandSequence(comm)");
 			MethodSpec method = builder.build();

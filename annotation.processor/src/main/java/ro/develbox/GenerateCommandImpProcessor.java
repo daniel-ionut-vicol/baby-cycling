@@ -22,7 +22,7 @@ public class GenerateCommandImpProcessor extends CommandsProcessor {
             elements.addAll(clientElements);
             for (TypeElement element : elements){
                 CommandImplGenerator generator = new CommandImplGenerator(element,"string");
-                generator.generateCode(elementUtils);
+                generator.generateCode(elementUtils,filer);
             }
         } catch (Exception e) {
             return true;
