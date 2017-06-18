@@ -9,7 +9,7 @@ import javax.lang.model.element.TypeElement;
 
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.ServerCommand;
-import ro.develbox.generator.ProtocolApiGenerator;
+import ro.develbox.generator.api.ProtocolApiGenerator;
 
 public class GenerateProtocolApiProcessor extends CommandsProcessor {
 

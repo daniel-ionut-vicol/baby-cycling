@@ -9,7 +9,7 @@ import javax.lang.model.element.TypeElement;
 
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.ServerCommand;
-import ro.develbox.generator.CommandImplGenerator;
+import ro.develbox.generator.command.CommandImplGenerator;
 
 public class GenerateCommandImpProcessor extends CommandsProcessor {
 

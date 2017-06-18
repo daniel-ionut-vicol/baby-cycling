@@ -1,4 +1,4 @@
-package ro.develbox.generator;
+package ro.develbox.generator.command;
 
 import java.io.Writer;
 import java.util.List;

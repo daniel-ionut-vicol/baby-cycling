@@ -1,4 +1,4 @@
-package ro.develbox.generator;
+package ro.develbox.generator.api;
 
 import java.io.IOException;
 import java.io.Writer;
