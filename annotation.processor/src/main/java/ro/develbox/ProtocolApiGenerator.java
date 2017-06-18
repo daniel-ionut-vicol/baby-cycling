@@ -96,7 +96,7 @@ public class ProtocolApiGenerator {
 					.addException(ProtocolViolatedException.class).addException(IOException.class).build();
 
 			try {
-				checkSetters(fieldsName, elementMethods);
+				Utils.checkSetters(fieldsName, elementMethods);
 			} catch (Exception e) {
 				// add class name to exception message
 				throw new Exception(e.getMessage() + " class " + element.getSimpleName());
@@ -107,7 +107,7 @@ public class ProtocolApiGenerator {
 			builder.addStatement("$T " + varName + " = ($T) client.createCommand($T.COMMAND);", className, className,
 					className);
 			for (String field : fieldsName) {
-				builder.addStatement(varName + "." + getSetterForField(field) + "(" + field + ")");
+				builder.addStatement(varName + "." + Utils.getSetterForField(field) + "(" + field + ")");
 			}
 			builder.addStatement("client.startCommandSequence(comm)");
 			MethodSpec method = builder.build();
@@ -122,28 +122,6 @@ public class ProtocolApiGenerator {
 		javaFile.writeTo(writer);
 		writer.flush();
 		writer.close();
-	}
-
-	private void checkSetters(List<String> fields, List<Element> methods) throws Exception {
-		for (String field : fields) {
-			checkSetter(field, methods);
-		}
-	}
-
-	private void checkSetter(String field, List<Element> methods) throws Exception {
-		String expectedName = getSetterForField(field);
-		for (Element method : methods) {
-			if (method.getSimpleName().toString().equals(expectedName)) {
-				return;
-			}
-		}
-		throw new Exception("Could not find setter(" + expectedName + ") for field : " + field);
-	}
-
-	private String getSetterForField(String field) {
-		String firstLetter = field.substring(0, 1);
-		String rest = field.substring(1);
-		return "set" + firstLetter.toUpperCase() + rest;
 	}
 
 	private TypeName getTypeName(Elements elementUtils, String canonicalClassName) {
