@@ -8,7 +8,11 @@ import javax.lang.model.element.VariableElement;
 
 import com.squareup.javapoet.MethodSpec;
 
+import ro.develbox.Utils;
+
 public class CommandMethodsGenerator {
+
+	private static final String SEP = "ro.develbox.commands.string.CommandConstructorString.PARAMSEP";
 
 	List<VariableElement> fields;
 
@@ -17,48 +21,43 @@ public class CommandMethodsGenerator {
 		this.fields = fields;
 	}
 
-//    @Override
-//    public String toNetwork() {
-//        return COMMAND+getKey();
-//    }
-//
-//    @Override
-//    public void fromNetwork(String networkRep) {
-//        setKey(networkRep);
-//    }
-	
 	public MethodSpec generateToNetwork() {
 		MethodSpec.Builder toNetworkMethod = MethodSpec.methodBuilder("toNetwork");
 		toNetworkMethod.addModifiers(Modifier.PUBLIC);
 		toNetworkMethod.returns(String.class);
 		toNetworkMethod.addAnnotation(Override.class);
 
-		for(VariableElement field : fields){
-			
+		StringBuilder statement = new StringBuilder();
+		statement.append("return COMMAND");
+		for (VariableElement field : fields) {
+			statement.append("+" + SEP + "+");
+			statement.append(Utils.getGetterForField(field)+"()");
 		}
-		toNetworkMethod.addStatement("return \"\"");
+		toNetworkMethod.addStatement(statement.toString());
 		return toNetworkMethod.build();
 	}
-	
+
 	public MethodSpec generateFromNetwork() {
 		MethodSpec.Builder fromNetworkMethod = MethodSpec.methodBuilder("fromNetwork");
-	    fromNetworkMethod.addModifiers(Modifier.PUBLIC);
-	    fromNetworkMethod.addAnnotation(Override.class);
-	    fromNetworkMethod.addParameter(String.class, "networkRep");
+		fromNetworkMethod.addModifiers(Modifier.PUBLIC);
+		fromNetworkMethod.addAnnotation(Override.class);
+		fromNetworkMethod.addParameter(String.class, "networkRep");
 
-	    for(VariableElement field : fields){
-			
+		fromNetworkMethod.addStatement("String [] split = networkRep.split("+SEP+")");
+		int var = 0 ;
+		for (VariableElement field : fields) {
+			fromNetworkMethod.addStatement(Utils.getSetterForField(field)+"(split["+var+"])");
+			var++;
 		}
-	    
-	    return fromNetworkMethod.build();
+
+		return fromNetworkMethod.build();
 	}
-	
-	public List<MethodSpec> generateMethods(){
+
+	public List<MethodSpec> generateMethods() {
 		List<MethodSpec> methods = new ArrayList<>();
 		methods.add(generateToNetwork());
 		methods.add(generateFromNetwork());
 		return methods;
 	}
-
 
 }

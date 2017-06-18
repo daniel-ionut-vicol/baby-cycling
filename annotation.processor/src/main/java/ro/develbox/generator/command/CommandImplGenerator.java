@@ -38,7 +38,7 @@ public class CommandImplGenerator {
 	    
 	    Utils.checkGetterAndSetters(superElement);
 	    
-	    List<VariableElement> fields = ElementFilter.fieldsIn(superElement.getEnclosedElements());
+	    List<VariableElement> fields = Utils.filterStaticFields(ElementFilter.fieldsIn(superElement.getEnclosedElements()));
 	    CommandMethodsGenerator methGener = new CommandMethodsGenerator(fields);
 	    classBuilder.addMethods(methGener.generateMethods());
 	    

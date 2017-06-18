@@ -53,10 +53,18 @@ public class Utils {
 		throw new Exception("Could not find setter(" + expectedName + ") for field : " + field);
 	}
 
+	public static String getSetterForField(VariableElement field) {
+		return getSetterForField(field.getSimpleName().toString());
+	}
+	
 	public static String getSetterForField(String field) {
 		return getMethod("set", field);
 	}
 
+	public static String getGetterForField(VariableElement field) {
+		return getGetterForField(field.getSimpleName().toString());
+	}
+	
 	public static String getGetterForField(String field) {
 		return getMethod("get", field);
 	}
