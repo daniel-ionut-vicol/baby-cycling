@@ -1,4 +1,4 @@
-package ro.develbox;
+package ro.develbox.generator;
 
 import java.io.Writer;
 import java.util.List;
@@ -14,6 +14,8 @@ import javax.tools.JavaFileObject;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+
+import ro.develbox.Utils;
 
 public class CommandImplGenerator {
 

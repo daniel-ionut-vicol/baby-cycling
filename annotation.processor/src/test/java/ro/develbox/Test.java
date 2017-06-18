@@ -13,11 +13,12 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
+
+import ro.develbox.processor.GenerateProtocolApiProcessor;
+
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
-
-import ro.develbox.GenerateProtocolApiProcessor;
 
 public class Test {
 

@@ -1,4 +1,4 @@
-package ro.develbox;
+package ro.develbox.processor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,7 @@ import javax.lang.model.element.TypeElement;
 
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.ServerCommand;
+import ro.develbox.generator.CommandImplGenerator;
 
 public class GenerateCommandImpProcessor extends CommandsProcessor {
 

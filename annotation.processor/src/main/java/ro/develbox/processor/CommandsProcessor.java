@@ -1,4 +1,4 @@
-package ro.develbox;
+package ro.develbox.processor;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;

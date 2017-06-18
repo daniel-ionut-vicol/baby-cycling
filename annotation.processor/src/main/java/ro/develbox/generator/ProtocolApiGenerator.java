@@ -1,4 +1,4 @@
-package ro.develbox;
+package ro.develbox.generator;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -24,6 +24,7 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import ro.develbox.Utils;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
 import ro.develbox.protocol.exceptions.ProtocolViolatedException;

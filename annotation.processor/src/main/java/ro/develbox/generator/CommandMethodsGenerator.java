@@ -1,4 +1,4 @@
-package ro.develbox;
+package ro.develbox.generator;
 
 import java.util.ArrayList;
 import java.util.List;
