@@ -11,6 +11,12 @@ buildscript {
 
 apply plugin: "net.ltgt.apt"
 
+sourceSets {
+    generated{
+         java.srcDir "${buildDir}/generated/src/java/"
+     }
+ }
+
 dependencies {
 	
     compile project (':protocol.core')
@@ -21,8 +27,38 @@ dependencies {
 }
 
 tasks.withType(JavaCompile) {
-	// we need to make sure that annotation processor jar was created
-	 dependsOn ':annotation.processor:fatJar'
-	 
 	 options.fork = true
+}
+
+task generate(type: JavaCompile) {
+    // we need to make sure that annotation processor jar was created
+    dependsOn ':annotation.processor:fatJar'
+    classpath = sourceSets.main.compileClasspath + configurations.compile + configurations.apt
+    source = sourceSets.main.java.srcDirs
+    destinationDir = file("${buildDir}/classesGenerated")
+    generatedSourcesDestinationDir = file("${buildDir}/generated/src/java/")
+}
+
+compileJava {
+    dependsOn 'generate'
+    aptOptions.annotationProcessing = false
+    source = sourceSets.main.java.srcDirs + sourceSets.generated.java.srcDirs
+}
+
+compileGeneratedJava{
+    dependsOn 'generate'
+    aptOptions.annotationProcessing = false
+    classpath = sourceSets.main.output + configurations.compile
+}
+
+jar
+{
+    from sourceSets.generated.output
+    from sourceSets.main.output
+    dependsOn compileJava
+    dependsOn compileGeneratedJava
+}
+
+task printSources {
+    println "Sources : " + sourceSets.main.java.srcDirs + sourceSets.generated.java.srcDirs
 }
