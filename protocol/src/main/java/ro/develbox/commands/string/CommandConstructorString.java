@@ -20,13 +20,13 @@ public class CommandConstructorString implements ICommandContructor {
         String commandParams = null;
         Command command = null;
         if (strCommand.startsWith(CommandLogin.COMMAND)) {
-            command = new CommandLoginString();
+            command = new CommandLoginstring();
             commandParams = strCommand.substring(CommandLogin.COMMAND.length());
         } else if (strCommand.startsWith(CommandRegister.COMMAND)) {
-            command = new CommandRegisterString();
+            command = new CommandRegisterstring();
             commandParams = strCommand.substring(CommandRegister.COMMAND.length());
-        } else if (strCommand.startsWith(CommandAuthString.COMMAND)) {
-            command = new CommandAuthString();
+        } else if (strCommand.startsWith(CommandAuthstring.COMMAND)) {
+            command = new CommandAuthstring();
             commandParams = strCommand.substring(CommandAuth.COMMAND.length());
         } else if (strCommand.startsWith(CommandMessage.COMMAND)) {
             command = new CommandMessageString();
@@ -47,11 +47,11 @@ public class CommandConstructorString implements ICommandContructor {
     public Command createCommandInstance(String commandName) {
         Command command = null;
         if (commandName.equals(CommandLogin.COMMAND)) {
-            command = new CommandLoginString();
+            command = new CommandLoginstring();
         } else if (commandName.equals(CommandRegister.COMMAND)) {
-            command = new CommandRegisterString();
-        } else if (commandName.equals(CommandAuthString.COMMAND)) {
-            command = new CommandAuthString();
+            command = new CommandRegisterstring();
+        } else if (commandName.equals(CommandAuth.COMMAND)) {
+            command = new CommandAuthstring();
         } else if (commandName.equals(CommandMessage.COMMAND)) {
             command = new CommandMessageString();
         }

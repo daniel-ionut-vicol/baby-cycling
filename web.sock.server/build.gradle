@@ -8,6 +8,9 @@ dependencies {
 	
 	// http://mvnrepository.com/artifact/javax.websocket/javax.websocket-api
 	compile group: 'javax.websocket', name: 'javax.websocket-api', version: '1.1'
-
+	testRuntime group: 'io.undertow', name: 'undertow-websockets-jsr', version: '1.4.15.Final'
+	testRuntime group: 'org.jboss.spec.javax.websocket', name: 'jboss-websocket-api_1.1_spec', version: '1.1.1.Final'
+	testRuntime group: 'io.undertow', name: 'undertow-core', version: '1.4.15.Final'
+	testRuntime group: 'io.undertow', name: 'undertow-servlet', version: '1.4.15.Final'
 }
 

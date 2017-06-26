@@ -44,7 +44,6 @@ public abstract class ClientProtocol extends NetworkProtocol {
 		CommandAuth auth = (CommandAuth) commandConstructor.createCommandInstance(CommandAuth.COMMAND);
 		// TODO set auth key
 		commChannel.sendCommand(auth);
-		commChannel.receiveCommand();
 	}
 
 }

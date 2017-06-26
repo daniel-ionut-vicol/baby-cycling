@@ -2,7 +2,7 @@ package ro.develbox;
 
 import java.net.URI;
 
-import ro.develbox.client.WSClientChannel;
+import ro.develbox.client.WebSockCommunicationChannel;
 
 public class Main {
 
@@ -11,7 +11,7 @@ public class Main {
 
         try {
             URI uri = new URI(destUri);
-            WSClientChannel channel = new WSClientChannel(uri);
+            WebSockCommunicationChannel channel = new WebSockCommunicationChannel(uri);
             
             ClientProtocolImpl client = new ClientProtocolImpl(channel);
             client.connect();

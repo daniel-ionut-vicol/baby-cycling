@@ -17,14 +17,12 @@ import ro.develbox.protocol.ICommunicationChannel;
 import ro.develbox.protocol.server.ServerProtocol;
 
 @ServerEndpoint(value = "/cyclingWSE")
-public class WebSocketEndPoint implements ICommunicationChannel {
+public class WebSocketEndPoint extends ICommunicationChannel {
 
     private ServerProtocol serverProtocol;
     private Session session;
-    private BlockingQueue<Command> commands;
     
     public WebSocketEndPoint(){
-    	commands = new LinkedBlockingQueue<>();
     }
 
     @OnOpen
@@ -32,6 +30,7 @@ public class WebSocketEndPoint implements ICommunicationChannel {
         System.out.println("Open");
         this.session = session;
         serverProtocol = new ServerProtocolImpl(this);
+        super.addListener(serverProtocol);
         try {
 			serverProtocol.connect();
 		} catch (Exception e) {
@@ -57,12 +56,7 @@ public class WebSocketEndPoint implements ICommunicationChannel {
     public void onMessage(String message, Session userSession) {
         System.out.println("MessageReceived : " + message);
         Command command = serverProtocol.getCommandConstructor().constructCommand(message);
-        try {
-			commands.offer(command, Long.MAX_VALUE, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        super.onReceiveCommand(command);
     }
 
     @OnError
@@ -92,19 +86,4 @@ public class WebSocketEndPoint implements ICommunicationChannel {
 	public void disconnect() throws Exception {
 		// TODO Auto-generated method stub
 	}
-
-	@Override
-	public Command receiveCommand() {
-		Command received = null;
-		while(session!=null && received==null){
-			try {
-				received = commands.poll(100, TimeUnit.MILLISECONDS);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return received;
-	}
-
 }
