@@ -4,8 +4,8 @@ package ro.develbox;
 
 import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandLogin;
-import ro.develbox.commands.CommandMessage;
-import ro.develbox.commands.CommandMessage.TYPE;
+import ro.develbox.commands.CommandMessageAnn;
+import ro.develbox.commands.CommandMessageAnn.TYPE;
 import ro.develbox.commands.CommandRegister;
 import ro.develbox.commands.ICommandContructor;
 import ro.develbox.model.User;
@@ -34,7 +34,7 @@ public class ServerResponserImpl implements IProtocolResponse{
 	private Command handleLogin(CommandLogin loginInfo){
 		//TODO validate login data
 		loggedUser = new User();
-		CommandMessage response = (CommandMessage)commandConstr.constructCommand(CommandMessage.COMMAND);
+		CommandMessageAnn response = (CommandMessageAnn)commandConstr.constructCommand(CommandMessageAnn.COMMAND);
 		response.setType(TYPE.OK);
 		response.setMessage("OK");
 		return response;
@@ -43,7 +43,7 @@ public class ServerResponserImpl implements IProtocolResponse{
 	private Command handleRegister(CommandRegister registerInfo){
 		//TODO validate register data and add user
 		loggedUser = new User();
-		CommandMessage response = (CommandMessage)commandConstr.constructCommand(CommandMessage.COMMAND);
+		CommandMessageAnn response = (CommandMessageAnn)commandConstr.constructCommand(CommandMessageAnn.COMMAND);
 		response.setType(TYPE.OK);
 		response.setMessage("OK");
 		return response;

@@ -10,7 +10,7 @@ import java.lang.annotation.RetentionPolicy;
  *
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Inherited
+//@Inherited
 public @interface TerminalCommand {
     
 }

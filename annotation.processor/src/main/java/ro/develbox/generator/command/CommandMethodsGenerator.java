@@ -12,7 +12,7 @@ import ro.develbox.Utils;
 
 public class CommandMethodsGenerator {
 
-	private static final String SEP = "ro.develbox.commands.string.CommandConstructorString.PARAMSEP";
+	private static final String SEP = "ro.develbox.commands.ICommandContructor.PARAMSEP";
 
 	List<VariableElement> fields;
 

@@ -9,6 +9,8 @@ import ro.develbox.commands.CommandMessage.TYPE;
  */
 public interface ICommandContructor {
 
+    public static final String PARAMSEP = "0012300";
+	
     public Command constructCommand(String strCommand);
 
     public CommandMessage contructMessageCommand(TYPE type, String message);

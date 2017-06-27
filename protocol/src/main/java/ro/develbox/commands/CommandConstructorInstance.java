@@ -1,6 +1,6 @@
 package ro.develbox.commands;
 
-import ro.develbox.commands.string.CommandConstructorString;
+//import ro.develbox.commands.string.CommandConstructorString;
 
 /**
  * just a class that holds the ICommandContructor that we wish to use 
@@ -9,6 +9,6 @@ import ro.develbox.commands.string.CommandConstructorString;
  */
 public class CommandConstructorInstance {
 
-    public static final ICommandContructor commandConstructor = new CommandConstructorString();
+    public static final ICommandContructor commandConstructor = null;//= new CommandConstructorString();
     
 }

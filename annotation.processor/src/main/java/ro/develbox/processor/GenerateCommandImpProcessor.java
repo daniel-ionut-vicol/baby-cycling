@@ -9,6 +9,7 @@ import javax.lang.model.element.TypeElement;
 
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.ServerCommand;
+import ro.develbox.generator.command.CommandConstructorGenerator;
 import ro.develbox.generator.command.CommandImplGenerator;
 
 public class GenerateCommandImpProcessor extends CommandsProcessor {
@@ -25,6 +26,8 @@ public class GenerateCommandImpProcessor extends CommandsProcessor {
                 CommandImplGenerator generator = new CommandImplGenerator(element,"string");
                 generator.generateCode(elementUtils,filer);
             }
+            CommandConstructorGenerator ccg = new CommandConstructorGenerator(elements);
+            ccg.generate(elementUtils, filer);
         } catch (Exception e) {
             return true;
         }
