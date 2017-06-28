@@ -1,6 +1,7 @@
 package ro.develbox.processor;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -19,14 +20,15 @@ public class GenerateCommandImpProcessor extends CommandsProcessor {
 	    try {
             List<TypeElement> serverElements = getCommandElements(env, ServerCommand.class);
             List<TypeElement> clientElements = getCommandElements(env, ClientCommand.class);
-            List<TypeElement> elements = new ArrayList<>();
-            elements.addAll(serverElements);
-            elements.addAll(clientElements);
-            for (TypeElement element : elements){
+            Set<TypeElement> setElements = new LinkedHashSet<>();
+            setElements.addAll(serverElements);
+            setElements.addAll(clientElements);
+            
+            for (TypeElement element : setElements){
                 CommandImplGenerator generator = new CommandImplGenerator(element,"string");
                 generator.generateCode(elementUtils,filer);
             }
-            CommandConstructorGenerator ccg = new CommandConstructorGenerator(elements);
+            CommandConstructorGenerator ccg = new CommandConstructorGenerator(setElements);
             ccg.generate(elementUtils, filer);
         } catch (Exception e) {
             return true;

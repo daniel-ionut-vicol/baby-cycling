@@ -16,7 +16,7 @@ import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.ServerCommand;
 import ro.develbox.commands.ClientTypeTestCommand;
 import ro.develbox.commands.Command;
-import ro.develbox.commands.CommandMessageAnn;
+import ro.develbox.commands.CommandMessage;
 import ro.develbox.commands.MockAuth;
 import ro.develbox.commands.ServerTypeTestCommand;
 import ro.develbox.commands.TestTypeCommand;
@@ -105,7 +105,7 @@ public class ProtocolImplTest extends ProtocolTest {
             throws WarnCommandException, ErrorCommandException, ProtocolViolatedException, IOException {
         new Expectations() {
             {
-                channel.sendCommand((CommandMessageAnn)any);
+                channel.sendCommand((CommandMessage)any);
                 times = 1;
             }
         };
