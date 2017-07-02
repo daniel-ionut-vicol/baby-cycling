@@ -70,8 +70,7 @@ public class WebSockCommunicationChannel extends ICommunicationChannel{
 
 	@Override
 	public void sendCommand(Command command) throws IOException {
-		// TODO Auto-generated method stub
-		
+		adapter.getSession().getRemote().sendString(command.toNetwork());
 	}
 
 }

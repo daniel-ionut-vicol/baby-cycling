@@ -2,7 +2,6 @@ package ro.develbox.generator.command;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.Filer;
@@ -17,13 +16,14 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
+import ro.develbox.Utils;
 import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandMessage;
-import ro.develbox.commands.ICommandContructor;
 import ro.develbox.commands.CommandMessage.TYPE;
+import ro.develbox.commands.ICommandContructor;
+import ro.develbox.processor.stringImpl.StringImpConstants;
 
 public class CommandConstructorGenerator {
-	private static final String fileName= "CommandConstructorString";
 	
 	Set<TypeElement> elements ;
 
@@ -33,7 +33,8 @@ public class CommandConstructorGenerator {
 	}
 	
 	public void generate(Elements elementUtils,Filer filer) throws IOException{
-		TypeSpec.Builder classBuilder= TypeSpec.classBuilder(fileName);
+		TypeSpec.Builder classBuilder= TypeSpec.classBuilder(StringImpConstants.CONSTR_CLASS);
+		classBuilder.addModifiers(Modifier.PUBLIC);
 		classBuilder.addSuperinterface(ICommandContructor.class);
 		
 		FieldSpec.Builder staticSepField = FieldSpec.builder(String.class, "PARAMSEP");
@@ -48,9 +49,9 @@ public class CommandConstructorGenerator {
         
         classBuilder.addMethod(createCommandInstanceMethod());
         
-		String packageName = "ro.develbox.commands.string";
+		String packageName = StringImpConstants.PACKAGE;
 	    JavaFile javaFile = JavaFile.builder(packageName, classBuilder.build()).build();
-		JavaFileObject jfo = filer.createSourceFile(packageName + "." + fileName);
+		JavaFileObject jfo = filer.createSourceFile(packageName + "." + StringImpConstants.CONSTR_CLASS);
 		Writer writer = jfo.openWriter();
 		javaFile.writeTo(writer);
 		writer.flush();
@@ -88,9 +89,13 @@ public class CommandConstructorGenerator {
 		for (TypeElement element : elements){
 			ClassName cName = ClassName.get(element);
 			String elementName = element.getSimpleName().toString();
-			constructCommand.nextControlFlow("else if ($L.startsWith($T.COMMAND))",paramName,cName)
-				.addStatement("$L = new "+elementName+"string()",returnName)
-				.addStatement("commandParams = strCommand.substring($T.COMMAND.length())",cName);
+			constructCommand.nextControlFlow("else if ($L.startsWith($T.COMMAND))",paramName,cName);
+			if(Utils.isAbstractClass(element)){
+				constructCommand.addStatement("$L = new "+elementName+StringImpConstants.IMPL_NAME+"()",returnName);
+			}else{
+				constructCommand.addStatement("$L = new "+elementName+"()",returnName);
+			}
+			constructCommand.addStatement("commandParams = strCommand.substring($T.COMMAND.length())",cName);
 		}
 		constructCommand.nextControlFlow("else");
 		constructCommand.addStatement("return null");
@@ -116,8 +121,12 @@ public class CommandConstructorGenerator {
 				;
 		for (TypeElement element : elements){
 			String elementName = element.getSimpleName().toString();
-			createCommandInstance.nextControlFlow("else if (commandName.equals("+elementName+".COMMAND))")
-				.addStatement("command = new "+elementName+"string()");
+			createCommandInstance.nextControlFlow("else if (commandName.equals("+elementName+".COMMAND))");
+			if(Utils.isAbstractClass(element)){
+				createCommandInstance.addStatement("command = new "+elementName+StringImpConstants.IMPL_NAME+"()");
+			}else{
+				createCommandInstance.addStatement("command = new "+elementName+"()");
+			}
 		}
 		createCommandInstance.endControlFlow();
 		

@@ -25,9 +25,9 @@ public class ServerProtocolViolatedException extends ProtocolViolatedException {
         ServerCommand annotation = command.getClass().getAnnotation(ServerCommand.class);
         String annotationStr = null;
         if (annotation != null) {
-            ClientCommand cc = (ClientCommand)annotation;
-            annotationStr = " next command : " + Arrays.toString(cc.nextCommandType()) + ",response :"
-                    + Arrays.toString(cc.responseCommandType());
+//            ClientCommand cc = (ClientCommand)annotation;
+            annotationStr = " next command : " + Arrays.toString(annotation.nextCommandType()) + ",response :"
+                    + Arrays.toString(annotation.responseCommandType());
         } else {
             annotationStr = " NO ANNOTATION ";
         }

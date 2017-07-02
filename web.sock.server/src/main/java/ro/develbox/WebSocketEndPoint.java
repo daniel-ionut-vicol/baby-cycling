@@ -15,11 +15,12 @@ import javax.websocket.server.ServerEndpoint;
 import ro.develbox.commands.Command;
 import ro.develbox.protocol.ICommunicationChannel;
 import ro.develbox.protocol.server.ServerProtocol;
+import ro.develbox.protocol.server.ServerProtocolApi;
 
 @ServerEndpoint(value = "/cyclingWSE")
 public class WebSocketEndPoint extends ICommunicationChannel {
 
-    private ServerProtocol serverProtocol;
+    private ServerProtocolApi serverProtocol;
     private Session session;
     
     public WebSocketEndPoint(){
@@ -29,7 +30,7 @@ public class WebSocketEndPoint extends ICommunicationChannel {
     public void onOpen(Session session) {
         System.out.println("Open");
         this.session = session;
-        serverProtocol = new ServerProtocolImpl(this);
+        serverProtocol = new ServerProtocolApi(new ServerResponserImpl(),this);
         super.addListener(serverProtocol);
         try {
 			serverProtocol.connect();

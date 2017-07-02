@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @SuppressWarnings("rawtypes")
-//@Inherited
+@Inherited
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ServerCommand {
     

@@ -14,8 +14,7 @@ import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
 
 public class Test {
 
-	@org.testng.annotations.Test
-	public void test() {
+	public static void main(String[] args) {
 		PathHandler path = Handlers.path();
 
 

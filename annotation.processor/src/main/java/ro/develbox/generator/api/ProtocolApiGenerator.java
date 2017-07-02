@@ -25,8 +25,11 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import ro.develbox.Utils;
+import ro.develbox.commands.Command;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
+import ro.develbox.processor.stringImpl.StringImpConstants;
+import ro.develbox.protocol.IProtocolResponse;
 import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 
 public class ProtocolApiGenerator {
@@ -49,24 +52,28 @@ public class ProtocolApiGenerator {
 	}
 
 	public void generateCode(Elements elementUtils, Filer filer, String packageName, String generatedClass,
-			String wrappedClass) throws Exception {
+			String superClass) throws Exception {
 
 		List<MethodSpec> methods = new ArrayList<>();
 
-		TypeName clientProtocolType = getTypeName(elementUtils, wrappedClass);
+		TypeName superProtocolType = getTypeName(elementUtils, superClass);
+		TypeName communicationChannel = getTypeName(elementUtils, "ro.develbox.protocol.ICommunicationChannel");
 
 		// class fields
-		TypeSpec.Builder clientProtocol = TypeSpec.classBuilder(generatedClass).addModifiers(Modifier.PUBLIC)
-				.addField(clientProtocolType, "client");
-
+		TypeSpec.Builder protocolApi = TypeSpec.classBuilder(generatedClass).addModifiers(Modifier.PUBLIC);
+		protocolApi.superclass(superProtocolType);
 		// class constructors
-		MethodSpec constructor = MethodSpec.constructorBuilder().addParameter(clientProtocolType, "client")
-				.addStatement("this.client=client").build();
+		MethodSpec constructor = MethodSpec.constructorBuilder()
+				.addModifiers(Modifier.PUBLIC)
+				.addParameter(IProtocolResponse.class, "responder")
+				.addParameter(communicationChannel,"commChannel")
+				.addStatement("super($L,$L,$L)","responder","commChannel", "new " + StringImpConstants.PACKAGE+"."+StringImpConstants.CONSTR_CLASS+"()")
+				.build();
 		methods.add(constructor);
 
 		// class methods
 		for (TypeElement element : elements) {
-			String name = element.getSimpleName().toString();
+			String name = "send"+element.getSimpleName().toString();
 
 			List<ParameterSpec> parameters = new ArrayList<>();
 
@@ -84,6 +91,7 @@ public class ProtocolApiGenerator {
 			com.squareup.javapoet.MethodSpec.Builder builder = MethodSpec.methodBuilder(name);
 
 			builder.addModifiers(Modifier.PUBLIC).returns(void.class).addParameters(parameters)
+					.returns(Command.class)
 					.addException(WarnCommandException.class).addException(ErrorCommandException.class)
 					.addException(ProtocolViolatedException.class).addException(IOException.class).build();
 
@@ -98,19 +106,19 @@ public class ProtocolApiGenerator {
 
 			ClassName className = ClassName.get(element);
 			String varName = "comm";
-			builder.addStatement("$T " + varName + " = ($T) client.createCommand($T.COMMAND);", className, className,
+			builder.addStatement("$T " + varName + " = ($T) createCommand($T.COMMAND);", className, className,
 					className);
 			for (VariableElement field : fields) {
 				builder.addStatement(varName + "." + Utils.getSetterForField(field.getSimpleName().toString()) + "(" + field + ")");
 			}
-			builder.addStatement("client.startCommandSequence(comm)");
+			builder.addStatement("return startCommandSequence(comm)");
 			MethodSpec method = builder.build();
 			methods.add(method);
 		}
 
-		clientProtocol.addMethods(methods);
+		protocolApi.addMethods(methods);
 
-		JavaFile javaFile = JavaFile.builder(packageName, clientProtocol.build()).build();
+		JavaFile javaFile = JavaFile.builder(packageName, protocolApi.build()).build();
 		JavaFileObject jfo = filer.createSourceFile(packageName + "." + generatedClass);
 		Writer writer = jfo.openWriter();
 		javaFile.writeTo(writer);
@@ -119,7 +127,7 @@ public class ProtocolApiGenerator {
 	}
 
 	private TypeName getTypeName(Elements elementUtils, String canonicalClassName) {
-		TypeElement commChannel = elementUtils.getTypeElement("ro.develbox.protocol.client.ClientProtocol");
+		TypeElement commChannel = elementUtils.getTypeElement(canonicalClassName);
 		TypeName type = TypeName.get(commChannel.asType());
 		return type;
 	}

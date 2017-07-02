@@ -13,32 +13,30 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
-
-import ro.develbox.processor.GenerateProtocolApiProcessor;
-
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
+import ro.develbox.processor.stringImpl.GenerateCommandStringImpProcessor;
+
 public class Test {
 
-    @org.testng.annotations.Test
-    public void runAnnoationProcessor() throws Exception {
+    public static void main(String[] args) throws Exception {
        String source = "d:/baby-cycling/protocol/src/main/java";
-       String compiled = "d:/baby-cycling/protocol/build/classes/main";
+//       String compiled = "d:/baby-cycling/protocol/build/classes/main";
 
        Iterable<JavaFileObject> files = getSourceFiles(source);
-       Iterable<JavaFileObject> compiledFiles = getSourceFiles(compiled);
+//       Iterable<JavaFileObject> compiledFiles = getSourceFiles(compiled);
 
        List<JavaFileObject> allfiles = new ArrayList<>();
        Iterator<JavaFileObject> i = files.iterator();
        while(i.hasNext()){
     	   allfiles.add(i.next());
        }
-        i = compiledFiles.iterator();
-       while(i.hasNext()){
-    	   allfiles.add(i.next());
-       }
+//        i = compiledFiles.iterator();
+//       while(i.hasNext()){
+//    	   allfiles.add(i.next());
+//       }
        
        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
@@ -47,12 +45,12 @@ public class Test {
        optionList.add(System.getProperty("java.class.path"));
        
        CompilationTask task = compiler.getTask(new PrintWriter(System.out), null, null, optionList, null, allfiles);
-       task.setProcessors(Arrays.asList(new GenerateProtocolApiProcessor()));
+       task.setProcessors(Arrays.asList(new GenerateCommandStringImpProcessor()));
 
        task.call();
     }
 
-    private Iterable<JavaFileObject> getSourceFiles(String p_path) throws Exception {
+    private static Iterable<JavaFileObject> getSourceFiles(String p_path) throws Exception {
       JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
       StandardJavaFileManager files = compiler.getStandardFileManager(null, null, null);
 
@@ -62,7 +60,7 @@ public class Test {
       return files.list(StandardLocation.SOURCE_PATH, "", fileKinds, true);
     }
     
-    private Iterable<JavaFileObject> getCompileFiles(String p_path) throws Exception {
+    private static Iterable<JavaFileObject> getCompileFiles(String p_path) throws Exception {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         StandardJavaFileManager files = compiler.getStandardFileManager(null, null, null);
 

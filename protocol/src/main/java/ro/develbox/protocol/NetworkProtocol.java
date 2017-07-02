@@ -1,7 +1,9 @@
 package ro.develbox.protocol;
 
 import java.io.IOException;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import ro.develbox.commands.Command;
@@ -24,6 +26,7 @@ public abstract class NetworkProtocol extends Protocol implements INetworkProtoc
 			ICommandContructor commandConstructor, Class commandAnnotation) {
 		super(responder, commandConstructor, commandAnnotation);
 		this.commChannel = commChannel;
+		commands = new LinkedBlockingQueue<>();
 	}
 
 	@Override
@@ -46,10 +49,12 @@ public abstract class NetworkProtocol extends Protocol implements INetworkProtoc
 		// while we did not reached the end of the sequence
 		do {
 			commChannel.sendCommand(toSend);
-			response = getReceiveCommand();
-			toSend = validateAndRespond(response);
-			if (toSend == null) {
-				break;
+			if(lastCommand!=null){
+				response = getReceiveCommand();
+				toSend = validateAndRespond(response);
+				if (toSend == null) {
+					break;
+				}
 			}
 		}while (lastCommand != null);
 		return response;

@@ -80,17 +80,18 @@ public abstract class CommandsProcessor extends AbstractProcessor {
 			return false;
 		}
 
-		// Check if it's an abstract class
-		if (!classElement.getModifiers().contains(Modifier.ABSTRACT)) {
-			error(classElement, "The class %s is not abstract. You can't annotate non abstract classes with @%",
-					classElement.getQualifiedName().toString(), ServerCommand.class.getSimpleName());
-			return false;
-		}
+		//Allow implementation of annotated classes, but we'll not genrerate a new implemenatation
+//		// Check if it's an abstract class
+//		if (!classElement.getModifiers().contains(Modifier.ABSTRACT)) {
+//			error(classElement, "The class %s is not abstract. You can't annotate non abstract classes with @%s",
+//					classElement.getQualifiedName().toString(), ServerCommand.class.getSimpleName());
+//			return false;
+//		}
 
 		Element commandClass = elementUtils.getTypeElement("ro.develbox.commands.Command");
 
 		// check if it extends Command
-		if (!classElement.getSuperclass().equals(commandClass.asType())) {
+		if (!classElement.getSuperclass().equals(commandClass.asType()) && classElement.getModifiers().contains(Modifier.ABSTRACT)) {
 			error(classElement, "The class %s does not extends ro.develbox.commands.Command",
 					classElement.getQualifiedName().toString());
 			return false;

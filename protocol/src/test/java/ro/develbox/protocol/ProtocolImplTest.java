@@ -23,8 +23,10 @@ import ro.develbox.commands.TestTypeCommand;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
 import ro.develbox.protocol.client.ClientProtocol;
+import ro.develbox.protocol.client.ClientProtocolApi;
 import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 import ro.develbox.protocol.server.ServerProtocol;
+import ro.develbox.protocol.server.ServerProtocolApi;
 
 public class ProtocolImplTest extends ProtocolTest {
 	
@@ -38,34 +40,34 @@ public class ProtocolImplTest extends ProtocolTest {
 	
     @Test
     public void testServerProtocolConstructor() {
-        Protocol serverP = new ServerProtocol(responder, channel){};
+        Protocol serverP = new ServerProtocolApi(responder, channel){};
         Assert.assertTrue(serverP.commandAnnotation == ServerCommand.class);
     }
 
     @Test
     public void testClientProtocolConstructor() {
-        Protocol clientP = new ClientProtocol(responder, channel){};
+        Protocol clientP = new ClientProtocolApi(responder, channel){};
         Assert.assertTrue(clientP.commandAnnotation == ClientCommand.class);
     }
 
     @Test(expectedExceptions = {
             ProtocolViolatedException.class }, expectedExceptionsMessageRegExp = ".*Command invalid.*")
     public void testClientCommandRejectedOnServer() throws Exception {
-        ServerProtocol serverP = new ServerProtocol(responder, channel){};
+        ServerProtocol serverP = new ServerProtocolApi(responder, channel){};
         serverP.validateAndRespond(new ClientTypeTestCommand());
     }
 
     @Test(expectedExceptions = {
             ProtocolViolatedException.class }, expectedExceptionsMessageRegExp = ".*Command invalid.*")
     public void testServerCommandRejectedOnClient() throws Exception {
-        ClientProtocol clientP = new ClientProtocol(responder, channel){};
+        ClientProtocol clientP = new ClientProtocolApi(responder, channel){};
         clientP.validateAndRespond(new ServerTypeTestCommand());
     }
 
     @DataProvider(name = "comandValidationDp")
     public Object[][] comandValidationDp() {
-        return new Object[][] { { new ServerProtocol(responder, channel){}, new ClientTypeTestCommand() },
-                { new ClientProtocol(responder, channel){}, new ServerTypeTestCommand() } };
+        return new Object[][] { { new ServerProtocolApi(responder, channel){}, new ClientTypeTestCommand() },
+                { new ClientProtocolApi(responder, channel){}, new ServerTypeTestCommand() } };
     }
 
     @Test(dataProvider = "comandValidationDp")
@@ -87,7 +89,7 @@ public class ProtocolImplTest extends ProtocolTest {
 
     @DataProvider(name = "protocolImpls")
     public Object[][] protocolImpls() {
-        return new Object[][] { { new ServerProtocol(responder, channel){} }, { new ClientProtocol(responder, channel){} } };
+        return new Object[][] { { new ServerProtocolApi(responder, channel){} }, { new ClientProtocolApi(responder, channel){} } };
     }
 
     @Test(dataProvider = "protocolImpls", expectedExceptions = {

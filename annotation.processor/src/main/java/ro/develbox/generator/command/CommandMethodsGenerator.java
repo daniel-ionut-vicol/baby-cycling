@@ -9,10 +9,9 @@ import javax.lang.model.element.VariableElement;
 import com.squareup.javapoet.MethodSpec;
 
 import ro.develbox.Utils;
+import ro.develbox.processor.stringImpl.StringImpConstants;
 
 public class CommandMethodsGenerator {
-
-	private static final String SEP = "ro.develbox.commands.ICommandContructor.PARAMSEP";
 
 	List<VariableElement> fields;
 
@@ -30,7 +29,7 @@ public class CommandMethodsGenerator {
 		StringBuilder statement = new StringBuilder();
 		statement.append("return COMMAND");
 		for (VariableElement field : fields) {
-			statement.append("+" + SEP + "+");
+			statement.append("+" + StringImpConstants.STRING_SEPARATOR + "+");
 			statement.append(Utils.getGetterForField(field)+"()");
 		}
 		toNetworkMethod.addStatement(statement.toString());
@@ -43,7 +42,7 @@ public class CommandMethodsGenerator {
 		fromNetworkMethod.addAnnotation(Override.class);
 		fromNetworkMethod.addParameter(String.class, "networkRep");
 
-		fromNetworkMethod.addStatement("String [] split = networkRep.split("+SEP+")");
+		fromNetworkMethod.addStatement("String [] split = networkRep.split("+StringImpConstants.STRING_SEPARATOR+")");
 		int var = 0 ;
 		for (VariableElement field : fields) {
 			fromNetworkMethod.addStatement(Utils.getSetterForField(field)+"(split["+var+"])");

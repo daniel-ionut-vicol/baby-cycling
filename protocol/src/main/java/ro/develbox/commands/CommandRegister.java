@@ -1,8 +1,12 @@
 package ro.develbox.commands;
 
 import ro.develbox.annotation.ServerCommand;
+import ro.develbox.annotation.StartCommand;
+import ro.develbox.annotation.TerminalCommand;
 
 @ServerCommand(nextCommandType = { CommandLogin.class })
+@StartCommand
+@TerminalCommand
 public abstract class CommandRegister extends Command {
     public static final String COMMAND = "reg:";
 

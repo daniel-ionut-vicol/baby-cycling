@@ -1,2 +1,2 @@
-ro.develbox.processor.GenerateProtocolApiProcessor
-ro.develbox.processor.GenerateCommandImpProcessor
+ro.develbox.processor.stringImpl.GenerateProtocolStringApiProcessor
+ro.develbox.processor.stringImpl.GenerateCommandStringImpProcessor

@@ -1,7 +1,5 @@
 package ro.develbox;
 
-
-
 import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandLogin;
 import ro.develbox.commands.CommandMessage;

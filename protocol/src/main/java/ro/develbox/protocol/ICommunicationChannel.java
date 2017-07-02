@@ -19,15 +19,19 @@ public abstract class ICommunicationChannel implements INetworkProtocol{
 	
 	public abstract void sendCommand(Command command) throws IOException;
 	
-	public void onReceiveCommand(Command command){
-		for(ICommandReceivedListener listener: listeners)
+	public void onReceiveCommand(final Command command){
+		for(final ICommandReceivedListener listener: listeners)
 		{
-			try {
-				listener.onCommandReceived(command);
-			} catch (WarnCommandException | ErrorCommandException | ProtocolViolatedException | IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			new Thread() {
+				public void run() {
+					try {
+						listener.onCommandReceived(command);
+					} catch (WarnCommandException | ErrorCommandException | ProtocolViolatedException | IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				};
+			}.start();
 		}
 	}
 	

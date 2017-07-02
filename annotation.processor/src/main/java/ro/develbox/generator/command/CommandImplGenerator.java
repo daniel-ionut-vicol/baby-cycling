@@ -22,11 +22,12 @@ public class CommandImplGenerator {
 	TypeElement superElement;
 	
 	String implName;
-	
-	public CommandImplGenerator(TypeElement superElement,String implName) {
+	String packageName;
+	public CommandImplGenerator(TypeElement superElement,String packageName,String implName) {
 		super();
 		this.superElement = superElement;
 		this.implName = implName;
+		this.packageName = packageName;
 	}
 	
 	public void generateCode(Elements elementUtils,Filer filer) throws Exception{
@@ -42,7 +43,6 @@ public class CommandImplGenerator {
 	    CommandMethodsGenerator methGener = new CommandMethodsGenerator(fields);
 	    classBuilder.addMethods(methGener.generateMethods());
 	    
-	    String packageName = superElement.getQualifiedName().toString().replaceAll(elementName, "")+implName;
 	    JavaFile javaFile = JavaFile.builder(packageName, classBuilder.build()).build();
 		JavaFileObject jfo = filer.createSourceFile(packageName + "." + newName);
 		Writer writer = jfo.openWriter();
