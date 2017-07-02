@@ -68,6 +68,7 @@ public class ProtocolApiGenerator {
 				.addParameter(IProtocolResponse.class, "responder")
 				.addParameter(communicationChannel,"commChannel")
 				.addStatement("super($L,$L,$L)","responder","commChannel", "new " + StringImpConstants.PACKAGE+"."+StringImpConstants.CONSTR_CLASS+"()")
+				.addStatement("responder.setCommandConstr(new " + StringImpConstants.PACKAGE+"."+StringImpConstants.CONSTR_CLASS+"())")
 				.build();
 		methods.add(constructor);
 

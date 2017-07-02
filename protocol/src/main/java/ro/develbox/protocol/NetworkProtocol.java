@@ -14,13 +14,15 @@ import ro.develbox.commands.exceptions.WarnCommandException;
 import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 
 @SuppressWarnings("rawtypes")
-public abstract class NetworkProtocol extends Protocol implements INetworkProtocol,ICommandReceivedListener {
+public abstract class NetworkProtocol extends Protocol implements INetworkProtocol, ICommandReceivedListener {
 
 	private BlockingQueue<Command> commands;
-	
+
 	protected boolean connected;
 
 	protected ICommunicationChannel commChannel;
+
+	protected volatile boolean sequenceStarted = false;
 
 	protected NetworkProtocol(IProtocolResponse responder, ICommunicationChannel commChannel,
 			ICommandContructor commandConstructor, Class commandAnnotation) {
@@ -41,45 +43,47 @@ public abstract class NetworkProtocol extends Protocol implements INetworkProtoc
 		commChannel.disconnect();
 		this.connected = false;
 	}
-	
+
 	public Command startCommandSequence(Command command)
 			throws WarnCommandException, ErrorCommandException, ProtocolViolatedException, IOException {
+		sequenceStarted = true;
 		Command response = null;
 		Command toSend = command;
 		// while we did not reached the end of the sequence
 		do {
 			commChannel.sendCommand(toSend);
-			if(lastCommand!=null){
-				response = getReceiveCommand();
-				toSend = validateAndRespond(response);
-				if (toSend == null) {
-					break;
-				}
+			response = getReceiveCommand();
+			toSend = validateAndRespond(response);
+			if (toSend == null) {
+				break;
 			}
-		}while (lastCommand != null);
+		} while (lastCommand != null);
+		sequenceStarted = false;
 		return response;
 	}
 
 	@Override
-	public void onCommandReceived(Command command) throws WarnCommandException, ErrorCommandException, ProtocolViolatedException, IOException {
-		
-		if(lastCommand == null){
-			//if we did not start a command sequence, start it now 
-			Command toSend = validateAndRespond(command);
-			startCommandSequence(toSend);
-		}else{
+	public void onCommandReceived(Command command)
+			throws WarnCommandException, ErrorCommandException, ProtocolViolatedException, IOException {
+		if (sequenceStarted) {
 			try {
 				commands.put(command);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		} 
+		else {
+			// if we did not start a command sequence, start it now
+			Command toSend = validateAndRespond(command);
+			commChannel.sendCommand(toSend);
+//			startCommandSequence(toSend);
 		}
 	}
-	
+
 	public Command getReceiveCommand() {
 		Command received = null;
-		while(received==null){
+		while (received == null) {
 			try {
 				received = commands.poll(100, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
@@ -89,7 +93,7 @@ public abstract class NetworkProtocol extends Protocol implements INetworkProtoc
 		}
 		return received;
 	}
-	
+
 	protected abstract void afterConnected() throws IOException;
 
 	public Command createCommand(String command) {

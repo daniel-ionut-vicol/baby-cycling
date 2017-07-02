@@ -32,7 +32,7 @@ public class ServerResponserImpl implements IProtocolResponse{
 	private Command handleLogin(CommandLogin loginInfo){
 		//TODO validate login data
 		loggedUser = new User();
-		CommandMessage response = (CommandMessage)commandConstr.constructCommand(CommandMessage.COMMAND);
+		CommandMessage response = (CommandMessage)commandConstr.createCommandInstance(CommandMessage.COMMAND);
 		response.setType(TYPE.OK);
 		response.setMessage("OK");
 		return response;

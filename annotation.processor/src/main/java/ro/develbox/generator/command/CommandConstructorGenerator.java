@@ -59,6 +59,10 @@ public class CommandConstructorGenerator {
 	}
 	
 	private MethodSpec contructMessageCommandMethod(){
+		//TODO change this to : 
+		//createCommandInstance to get instance 
+		//then .setType(type);
+        //then .setMessage(message);
 		MethodSpec.Builder contructMessageCommand = MethodSpec.methodBuilder("contructMessageCommand");
 		contructMessageCommand.addAnnotation(Override.class);
 		contructMessageCommand.addModifiers(Modifier.PUBLIC);
