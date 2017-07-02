@@ -20,6 +20,7 @@ public abstract class ICommunicationChannel implements INetworkProtocol{
 	public abstract void sendCommand(Command command) throws IOException;
 	
 	public void onReceiveCommand(final Command command){
+		System.out.println("received:" + command);
 		for(final ICommandReceivedListener listener: listeners)
 		{
 			new Thread() {

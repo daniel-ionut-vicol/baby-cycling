@@ -55,7 +55,6 @@ public class WebSocketEndPoint extends ICommunicationChannel {
 
     @OnMessage
     public void onMessage(String message, Session userSession) {
-        System.out.println("MessageReceived : " + message);
         Command command = serverProtocol.getCommandConstructor().constructCommand(message);
         super.onReceiveCommand(command);
     }
@@ -70,6 +69,7 @@ public class WebSocketEndPoint extends ICommunicationChannel {
     public void sendCommand(Command command) {
         if (session != null) {
             try {
+        		System.out.println("sent server:" + command);
                 session.getBasicRemote().sendText(command.toNetwork());
             } catch (IOException e) {
                 e.printStackTrace();

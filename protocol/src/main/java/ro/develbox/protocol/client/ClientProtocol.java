@@ -5,7 +5,6 @@ import java.io.IOException;
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.commands.Command;
 import ro.develbox.commands.CommandAuth;
-import ro.develbox.commands.CommandConstructorInstance;
 import ro.develbox.commands.ICommandContructor;
 import ro.develbox.protocol.ICommunicationChannel;
 import ro.develbox.protocol.IProtocolResponse;

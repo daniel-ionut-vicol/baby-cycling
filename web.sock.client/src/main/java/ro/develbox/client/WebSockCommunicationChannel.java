@@ -11,7 +11,6 @@ import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import ro.develbox.commands.Command;
-import ro.develbox.commands.CommandConstructorInstance;
 import ro.develbox.commands.ICommandContructor;
 import ro.develbox.protocol.ICommunicationChannel;
 
@@ -23,13 +22,8 @@ public class WebSockCommunicationChannel extends ICommunicationChannel{
 	private URI uri;
     ICommandContructor commandConstr;
     
-    public WebSockCommunicationChannel(URI uri){
-    	this(uri,CommandConstructorInstance.commandConstructor);
-    }
-    
-    public WebSockCommunicationChannel(URI uri, ICommandContructor commandConstr) {
+    public WebSockCommunicationChannel(URI uri) {
         this.uri = uri;
-        this.commandConstr = commandConstr;
         adapter = new WebSocketAdapter(){
         	@Override
         	public void onWebSocketText(String message) {
@@ -70,6 +64,7 @@ public class WebSockCommunicationChannel extends ICommunicationChannel{
 
 	@Override
 	public void sendCommand(Command command) throws IOException {
+		System.out.println("sent client:" + command);
 		adapter.getSession().getRemote().sendString(command.toNetwork());
 	}
 
