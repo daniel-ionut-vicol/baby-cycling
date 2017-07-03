@@ -16,6 +16,8 @@ import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 @SuppressWarnings("rawtypes")
 public abstract class NetworkProtocol extends Protocol implements INetworkProtocol, ICommandReceivedListener {
 
+	private Object srLock = new Object();
+	
 	private BlockingQueue<Command> commands;
 
 	protected boolean connected;
@@ -46,19 +48,23 @@ public abstract class NetworkProtocol extends Protocol implements INetworkProtoc
 
 	public Command startCommandSequence(Command command)
 			throws WarnCommandException, ErrorCommandException, ProtocolViolatedException, IOException {
-		sequenceStarted = true;
+
 		Command response = null;
 		Command toSend = command;
-		// while we did not reached the end of the sequence
-		do {
-			commChannel.sendCommand(toSend);
-			response = getReceiveCommand();
-			toSend = validateAndRespond(response);
-			if (toSend == null) {
-				break;
-			}
-		} while (lastCommand != null);
-		sequenceStarted = false;
+		synchronized (srLock) {
+			sequenceStarted = true;
+			// while we did not reached the end of the sequence
+			do {
+				commChannel.sendCommand(toSend);
+				response = getReceiveCommand();
+				toSend = validateAndRespond(response);
+				if (toSend == null) {
+					break;
+				}
+			} while (lastCommand != null);
+			sequenceStarted = false;
+		}
+
 		return response;
 	}
 
@@ -74,10 +80,14 @@ public abstract class NetworkProtocol extends Protocol implements INetworkProtoc
 			}
 		} 
 		else {
-			// if we did not start a command sequence, start it now
-			Command toSend = validateAndRespond(command);
-			commChannel.sendCommand(toSend);
-//			startCommandSequence(toSend);
+			synchronized (srLock) {
+				// if we did not start a command sequence, start it now
+				Command toSend = validateAndRespond(command);
+				if(toSend!=null){
+					commChannel.sendCommand(toSend);
+				}
+				// startCommandSequence(toSend);
+			}
 		}
 	}
 
