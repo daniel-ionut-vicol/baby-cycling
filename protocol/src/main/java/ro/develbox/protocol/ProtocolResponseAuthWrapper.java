@@ -14,7 +14,8 @@ public class ProtocolResponseAuthWrapper implements IProtocolResponse{
     public ProtocolResponseAuthWrapper(IProtocolResponse wrapped,ICommandContructor commandConstrutor) {
         this.wrapped = wrapped;
         this.commandConstrutor = commandConstrutor;
-        authenticated = false;
+        //we seem to have some issue with authentication process, activate it by default
+        authenticated = true;
     }
 
     @Override

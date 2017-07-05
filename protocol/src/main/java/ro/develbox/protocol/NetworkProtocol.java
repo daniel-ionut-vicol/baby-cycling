@@ -55,6 +55,7 @@ public abstract class NetworkProtocol extends Protocol implements INetworkProtoc
 			sequenceStarted = true;
 			// while we did not reached the end of the sequence
 			do {
+				System.out.println("onCommandReceived startCommandSequence : " + toSend);
 				commChannel.sendCommand(toSend);
 				response = getReceiveCommand();
 				toSend = validateAndRespond(response);
@@ -84,6 +85,7 @@ public abstract class NetworkProtocol extends Protocol implements INetworkProtoc
 				// if we did not start a command sequence, start it now
 				Command toSend = validateAndRespond(command);
 				if(toSend!=null){
+					System.out.println("onCommandReceived sent : " + toSend);
 					commChannel.sendCommand(toSend);
 				}
 				// startCommandSequence(toSend);

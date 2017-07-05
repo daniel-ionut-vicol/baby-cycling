@@ -41,8 +41,8 @@ public class ServerProtocol extends NetworkProtocol{
 
     @Override
     final protected void afterConnected() throws IOException {
-        CommandAuth auth = (CommandAuth)commandConstructor.createCommandInstance(CommandAuth.COMMAND);
-        //TODO set auth key
-        commChannel.sendCommand(auth);
+//        CommandAuth auth = (CommandAuth)commandConstructor.createCommandInstance(CommandAuth.COMMAND);
+//        //TODO set auth key
+//        commChannel.sendCommand(auth);
     }
 }

@@ -1,2 +1,3 @@
 ro.develbox.processor.stringImpl.GenerateProtocolStringApiProcessor
 ro.develbox.processor.stringImpl.GenerateCommandStringImpProcessor
+ro.develbox.processor.stringImpl.GenerateRespondersSuperClass
