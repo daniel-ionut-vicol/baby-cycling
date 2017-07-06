@@ -64,7 +64,6 @@ public class WebSockCommunicationChannel extends ICommunicationChannel{
 
 	@Override
 	public void sendCommand(Command command) throws IOException {
-		System.out.println("sent client:" + command);
 		adapter.getSession().getRemote().sendString(command.toNetwork());
 	}
 

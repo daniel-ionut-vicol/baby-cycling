@@ -69,7 +69,6 @@ public class WebSocketEndPoint extends ICommunicationChannel {
     public void sendCommand(Command command) {
         if (session != null) {
             try {
-        		System.out.println("sent server:" + command);
                 session.getBasicRemote().sendText(command.toNetwork());
             } catch (IOException e) {
                 e.printStackTrace();
