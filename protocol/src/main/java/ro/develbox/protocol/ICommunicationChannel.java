@@ -1,8 +1,8 @@
 package ro.develbox.protocol;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import ro.develbox.commands.Command;
 import ro.develbox.commands.exceptions.ErrorCommandException;
@@ -10,17 +10,15 @@ import ro.develbox.commands.exceptions.WarnCommandException;
 import ro.develbox.protocol.exceptions.ProtocolViolatedException;
 
 public abstract class ICommunicationChannel implements INetworkProtocol{
-
-	List<ICommandReceivedListener> listeners;
+	Set<ICommandReceivedListener> listeners;
 	
 	public ICommunicationChannel() {
-		listeners = new ArrayList<>();
+		listeners = new HashSet<>();
 	}
 	
 	public abstract void sendCommand(Command command) throws IOException;
 	
 	public void onReceiveCommand(final Command command){
-		System.out.println("received:" + command);
 		for(final ICommandReceivedListener listener: listeners)
 		{
 			new Thread() {
