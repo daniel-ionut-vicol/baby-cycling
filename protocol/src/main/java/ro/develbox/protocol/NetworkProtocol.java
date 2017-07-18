@@ -91,7 +91,7 @@ public abstract class NetworkProtocol extends Protocol implements INetworkProtoc
 		}
 	}
 
-	public Command getReceiveCommand() {
+	private Command getReceiveCommand() {
 		Command received = null;
 		while (received == null) {
 			try {
