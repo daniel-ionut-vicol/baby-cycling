@@ -11,6 +11,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import mockit.Expectations;
+import mockit.Mock;
 import mockit.MockUp;
 import ro.develbox.annotation.ClientCommand;
 import ro.develbox.annotation.ServerCommand;
@@ -35,7 +36,11 @@ public class ProtocolImplTest extends ProtocolTest {
 	@BeforeClass
 	public void setup(){
 		super.setup();
-		channel = new MockUp<ICommunicationChannel>(){}.getMockInstance();
+		channel = new MockUp<ICommunicationChannel>(){
+			@Mock public void addListener(ICommandReceivedListener listener){
+			}
+			
+		}.getMockInstance();
 	}
 	
     @Test
@@ -92,15 +97,16 @@ public class ProtocolImplTest extends ProtocolTest {
         return new Object[][] { { new ServerProtocolApi(responder, channel){} }, { new ClientProtocolApi(responder, channel){} } };
     }
 
-    @Test(dataProvider = "protocolImpls", expectedExceptions = {
-            RuntimeException.class }, expectedExceptionsMessageRegExp = "Not authenticated")
-    public void testCommandRejectedWhenNoAuthReceived(NetworkProtocol protocol)
-            throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
-        Command received = new TestTypeCommand();
-        Command response = protocol.validateAndRespond(received);
-        assertTrue(response == responderCommand);
-        assertTrue(protocol.lastCommand == received);
-    }
+    //TODO currently auth is disabled , uncomment after we enable it
+//    @Test(dataProvider = "protocolImpls", expectedExceptions = {
+//            RuntimeException.class }, expectedExceptionsMessageRegExp = "Not authenticated")
+//    public void testCommandRejectedWhenNoAuthReceived(NetworkProtocol protocol)
+//            throws WarnCommandException, ErrorCommandException, ProtocolViolatedException {
+//        Command received = new TestTypeCommand();
+//        Command response = protocol.validateAndRespond(received);
+//        assertTrue(response == responderCommand);
+//        assertTrue(protocol.lastCommand == received);
+//    }
 
     @Test(dataProvider = "protocolImpls")
     public void testCommandResponseSentAfterAutentication(NetworkProtocol protocol)
