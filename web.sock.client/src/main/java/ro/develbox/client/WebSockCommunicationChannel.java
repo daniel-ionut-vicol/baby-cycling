@@ -3,7 +3,6 @@ package ro.develbox.client;
 import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jetty.websocket.api.Session;
@@ -11,7 +10,6 @@ import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import ro.develbox.commands.Command;
-import ro.develbox.commands.ICommandContructor;
 import ro.develbox.protocol.ICommunicationChannel;
 
 public class WebSockCommunicationChannel extends ICommunicationChannel{
@@ -20,27 +18,17 @@ public class WebSockCommunicationChannel extends ICommunicationChannel{
 	private WebSocketClient client;
 	private WebSocketAdapter adapter;
 	private URI uri;
-    ICommandContructor commandConstr;
     
     public WebSockCommunicationChannel(URI uri) {
         this.uri = uri;
         adapter = new WebSocketAdapter(){
         	@Override
         	public void onWebSocketText(String message) {
-        		Command command = WebSockCommunicationChannel.this.commandConstr.constructCommand(message);
-                onReceiveCommand(command);
+                onReceiveCommand(message);
         	}
         };
     }
-	
-    public ICommandContructor getCommandConstr() {
-		return commandConstr;
-	}
 
-	public void setCommandConstr(ICommandContructor commandConstr) {
-		this.commandConstr = commandConstr;
-	}
-    
 	@Override
 	public void connect() throws Exception {
 		if (client == null) {

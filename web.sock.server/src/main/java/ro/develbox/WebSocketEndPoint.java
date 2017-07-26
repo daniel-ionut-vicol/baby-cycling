@@ -1,9 +1,6 @@
 package ro.develbox;
 
 import java.io.IOException;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -14,7 +11,6 @@ import javax.websocket.server.ServerEndpoint;
 
 import ro.develbox.commands.Command;
 import ro.develbox.protocol.ICommunicationChannel;
-import ro.develbox.protocol.server.ServerProtocol;
 import ro.develbox.protocol.server.ServerProtocolApi;
 
 @ServerEndpoint(value = "/cyclingWSE")
@@ -55,8 +51,7 @@ public class WebSocketEndPoint extends ICommunicationChannel {
 
     @OnMessage
     public void onMessage(String message, Session userSession) {
-        Command command = serverProtocol.getCommandConstructor().constructCommand(message);
-        super.onReceiveCommand(command);
+        super.onReceiveCommand(message);
     }
 
     @OnError

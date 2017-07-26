@@ -1,13 +1,11 @@
 package ro.develbox.protocol;
 
 import java.io.IOException;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import ro.develbox.commands.Command;
-import ro.develbox.commands.CommandLogin;
 import ro.develbox.commands.ICommandContructor;
 import ro.develbox.commands.exceptions.ErrorCommandException;
 import ro.develbox.commands.exceptions.WarnCommandException;
@@ -91,9 +89,12 @@ public abstract class NetworkProtocol extends Protocol implements INetworkProtoc
 		}
 	}
 
-	private Command getReceiveCommand() {
+	private Command getReceiveCommand() throws IOException {
 		Command received = null;
 		while (received == null) {
+			if(!connected){
+				throw new IOException("Disconnected");
+			}
 			try {
 				received = commands.poll(100, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
